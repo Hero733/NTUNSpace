@@ -11,6 +11,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
         .glass-panel { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); }
@@ -77,12 +80,8 @@
         </nav>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-        // ตั้งค่า Firebase
+    <script>
+        // --- เริ่มการเชื่อมต่อ Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyAlaTyhtXf-d6qDSD5AeWR33Hg3VCn55o8",
             authDomain: "ntunspace.firebaseapp.com",
@@ -92,52 +91,50 @@
             appId: "1:952526844615:web:d1f78ba8e3b44c24ee84e2",
             measurementId: "G-33DZ6EX79H"
         };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         const ADMIN_EMAILS = ['ntun21933@ntun.ac.th'];
         const SESSION_KEY = 'ntunUserSession';
         let currentUser = null;
         let activeRoom = null;
+
+        // กำหนดเป็น Object ว่างไว้ก่อน รอโหลดจาก Firebase
         let classroomsDB = {};
 
-        // ระบบ Real-time Listener ฟังการเปลี่ยนแปลงจาก Firestore
-        onSnapshot(collection(db, "rooms"), (snapshot) => {
-            classroomsDB = {};
-            snapshot.forEach((document) => {
-                classroomsDB[document.id] = document.data();
-            });
+        // ระบบ Real-time ดึงข้อมูลแทน LocalStorage
+        db.collection("spaces").doc("classroomsData").onSnapshot((doc) => {
+            if (doc.exists) {
+                classroomsDB = doc.data();
+            } else {
+                classroomsDB = {};
+            }
             
-            // อัปเดตหน้าจออัตโนมัติหากมีข้อมูลเปลี่ยนแปลง
-            if (activeRoom && classroomsDB[activeRoom]) {
-                window.renderSeatMap();
-            } else if (currentUser && currentUser.isAdmin && !activeRoom && !document.getElementById('loginPage').classList.contains('active')) {
-                window.renderTeacherRoomsList();
+            // สั่งให้หน้าจออัปเดตทันทีแบบ Real-time ถ้ามีคนกดจองหรือย้ายโต๊ะ
+            if (currentUser) {
+                if (activeRoom && document.getElementById('dragArea')) {
+                    renderSeatMap();
+                } else if (currentUser.isAdmin && !activeRoom && document.getElementById('teacherRoomsList')) {
+                    renderTeacherRoomsList();
+                }
             }
         });
 
-        // ฟังก์ชันช่วยบันทึกข้อมูลห้องลง Firestore
-        async function saveRoomToFirebase(roomCode, roomData) {
-            try {
-                await setDoc(doc(db, "rooms", roomCode), roomData);
-            } catch (error) {
-                console.error("Error saving room: ", error);
-                Swal.fire('ผิดพลาด', 'ไม่สามารถบันทึกข้อมูลลงฐานข้อมูลได้', 'error');
-            }
+        // ฟังก์ชันเซฟเปลี่ยนจาก LocalStorage ไปเซฟลง Firebase แทน
+        function saveDB() { 
+            db.collection("spaces").doc("classroomsData").set(classroomsDB)
+              .catch(err => console.error("Error saving to Firebase: ", err));
         }
-
+        
         function saveSession() {
             localStorage.setItem(SESSION_KEY, JSON.stringify({
                 user: currentUser,
-                expiry: Date.now() + (24 * 60 * 60 * 1000)
+                expiry: Date.now() + (24 * 60 * 60 * 1000) // อยู่ได้ 24 ชั่วโมง
             }));
         }
 
-        // ทำให้ฟังก์ชันผูกกับ Window เพื่อให้ HTML เรียกใช้ได้
-        window.handleGoogleLogin = function(response) {
+        // --- ระบบถอดรหัส Google Token เพื่อให้อ่านภาษาไทยออก ---
+        function handleGoogleLogin(response) {
             try {
                 const base64Url = response.credential.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -166,8 +163,9 @@
                 console.error("Login Error:", e);
                 Swal.fire('ผิดพลาด', 'ไม่สามารถอ่านข้อมูลชื่อจาก Google ได้', 'error');
             }
-        };
+        }
 
+        // เช็ค Session เดิมตอนเปิดหน้าเว็บ
         const sessionData = JSON.parse(localStorage.getItem(SESSION_KEY));
         if (sessionData && sessionData.expiry > Date.now()) {
             currentUser = sessionData.user;
@@ -183,15 +181,19 @@
             const badge = document.getElementById('roleBadge');
             badge.innerText = currentUser.isAdmin ? 'Admin' : 'Student';
             badge.className = `px-4 py-1.5 rounded-xl text-xs font-extrabold shadow-sm ${currentUser.isAdmin ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`;
-            window.renderDashboard();
+            
+            // รอ 0.5 วิให้ Firebase โหลดข้อมูลเสร็จก่อนแสดงผล Dashboard
+            setTimeout(() => {
+                renderDashboard();
+            }, 500);
         }
 
-        window.logout = function() { 
+        function logout() { 
             localStorage.removeItem(SESSION_KEY);
             location.reload(); 
-        };
+        }
 
-        window.renderDashboard = function() {
+        function renderDashboard() {
             document.getElementById('headerTitle').innerText = "หน้าหลัก";
             activeRoom = null;
             const content = document.getElementById('mainContent');
@@ -205,7 +207,7 @@
                         <button onclick="createRoom()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-4 rounded-2xl shadow-lg">สร้างห้อง</button>
                     </div>
                     <div id="teacherRoomsList" class="flex flex-col gap-4"></div>`;
-                window.renderTeacherRoomsList();
+                renderTeacherRoomsList();
             } else {
                 let joinedRoomsHTML = '';
                 if (currentUser.joinedRooms && currentUser.joinedRooms.length > 0) {
@@ -233,23 +235,17 @@
                         ${joinedRoomsHTML}
                     </div>`;
             }
-        };
+        }
 
-        window.createRoom = async function() {
-            const name = document.getElementById('roomName').value.trim();
-            const count = parseInt(document.getElementById('seatCount').value);
+        function createRoom() {
+            const name = document.getElementById('roomName').value.trim(), count = parseInt(document.getElementById('seatCount').value);
             if (!name || isNaN(count)) return Swal.fire('ผิดพลาด', 'กรอกข้อมูลให้ครบ', 'warning');
-            
             const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const newRoom = { name: name, maxSeats: count, isBookingOpen: true, seats: generateSeatData(count) };
-            
-            await saveRoomToFirebase(code, newRoom);
-            Swal.fire('สำเร็จ', 'รหัสห้อง: ' + code, 'success');
-            document.getElementById('roomName').value = '';
-            document.getElementById('seatCount').value = '';
-        };
+            classroomsDB[code] = { name: name, maxSeats: count, isBookingOpen: true, seats: generateSeatData(count) };
+            saveDB(); renderTeacherRoomsList(); Swal.fire('สำเร็จ', 'รหัสห้อง: ' + code, 'success');
+        }
 
-        window.renderTeacherRoomsList = function() {
+        function renderTeacherRoomsList() {
             let html = '';
             for (const [code, r] of Object.entries(classroomsDB)) {
                 html += `
@@ -258,32 +254,27 @@
                         <button onclick="event.stopPropagation(); deleteRoom('${code}')" class="bg-red-100 text-red-600 p-3 rounded-xl"><i class='bx bx-trash text-xl'></i></button>
                     </div>`;
             }
-            if(document.getElementById('teacherRoomsList')) {
+            if(document.getElementById('teacherRoomsList')){
                 document.getElementById('teacherRoomsList').innerHTML = html;
             }
-        };
+        }
 
-        window.deleteRoom = function(code) {
-            Swal.fire({title: 'ลบห้องนี้?', icon: 'warning', showCancelButton: true}).then(async (r) => {
-                if (r.isConfirmed) { 
-                    await deleteDoc(doc(db, "rooms", code));
-                }
+        function deleteRoom(code) {
+            Swal.fire({title: 'ลบห้องนี้?', icon: 'warning', showCancelButton: true}).then(r => {
+                if (r.isConfirmed) { delete classroomsDB[code]; saveDB(); renderTeacherRoomsList(); }
             });
-        };
+        }
 
-        window.joinRoom = function(directCode = null) {
+        function joinRoom(directCode = null) {
             const code = directCode || document.getElementById('roomCodeInput').value.trim().toUpperCase();
             if (classroomsDB[code]) { 
                 activeRoom = code; 
                 if (!currentUser.isAdmin) {
-                    if (!currentUser.joinedRooms.includes(code)) { 
-                        currentUser.joinedRooms.push(code); 
-                        saveSession(); 
-                    }
+                    if (!currentUser.joinedRooms.includes(code)) { currentUser.joinedRooms.push(code); saveSession(); }
                 }
-                window.renderSeatMap(); 
-            } else Swal.fire('ไม่พบห้อง', 'รหัสไม่ถูกต้อง หรือกำลังดึงข้อมูล', 'error');
-        };
+                renderSeatMap(); 
+            } else Swal.fire('ไม่พบห้อง', 'รหัสไม่ถูกต้อง', 'error');
+        }
 
         function applyDefaultLayout(seats) {
             const colX = [0, 85, 170,  295, 380, 465,  590, 675]; 
@@ -298,9 +289,10 @@
             return applyDefaultLayout(seats);
         }
 
-        window.renderSeatMap = function() {
+        function renderSeatMap() {
             const room = classroomsDB[activeRoom];
-            if(!room) return; // ป้องกัน error จังหวะลบห้อง
+            if (!room) return; // กันพังจังหวะลบห้อง
+            
             document.getElementById('headerTitle').innerText = room.name;
             const areaHeight = (Math.ceil(room.seats.length / 8) * 110) + 100; 
             
@@ -322,7 +314,7 @@
                     </div>
                 </div>`;
             document.getElementById('mainContent').innerHTML = html;
-        };
+        }
 
         function generateSeatHTML(seat) {
             const isBooked = seat.bookedBy !== null;
@@ -334,50 +326,37 @@
             </div>`;
         }
 
-        window.handleSeatClick = async function(roomId, seatId) {
-            const room = classroomsDB[roomId];
-            const seat = room.seats.find(s => s.id === seatId);
-            
+        function handleSeatClick(roomId, seatId) {
+            const room = classroomsDB[roomId], seat = room.seats.find(s => s.id === seatId);
             if (currentUser.isAdmin) {
                 if (seat.bookedBy) {
-                    Swal.fire({ title: 'ลบการจอง?', text: `ต้องการลบ "${seat.name}" ออก?`, icon: 'warning', showCancelButton: true }).then(async r => { 
-                        if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; await saveRoomToFirebase(roomId, room); }
-                    });
+                    Swal.fire({ title: 'ลบการจอง?', text: `ต้องการลบ "${seat.name}" ออก?`, icon: 'warning', showCancelButton: true }).then(r => { if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; saveDB(); renderSeatMap(); }});
                 } else {
-                    Swal.fire({ title: 'เพิ่มชื่อนักเรียน', input: 'text', showCancelButton: true }).then(async r => { 
-                        if(r.isConfirmed && r.value) { seat.bookedBy = 'manual'; seat.name = r.value; await saveRoomToFirebase(roomId, room); }
-                    });
+                    Swal.fire({ title: 'เพิ่มชื่อนักเรียน', input: 'text', showCancelButton: true }).then(r => { if(r.isConfirmed && r.value) { seat.bookedBy = 'manual'; seat.name = r.value; saveDB(); renderSeatMap(); }});
                 }
             } else {
                 if (!room.isBookingOpen) return Swal.fire('ปิดจอง', 'ครูปิดรับจองแล้ว', 'warning');
                 if (seat.bookedBy === currentUser.email) {
-                    Swal.fire({ title: 'ยกเลิกที่นั่ง?', showCancelButton: true }).then(async r => { 
-                        if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; await saveRoomToFirebase(roomId, room); }
-                    });
+                    Swal.fire({ title: 'ยกเลิกที่นั่ง?', showCancelButton: true }).then(r => { if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; saveDB(); renderSeatMap(); }});
                 } else if (!seat.bookedBy) {
                     if (room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire('จองได้ที่เดียว', '', 'error');
-                    Swal.fire({ title: 'จองที่นั่งนี้?', showCancelButton: true }).then(async r => { 
-                        if(r.isConfirmed) { seat.bookedBy = currentUser.email; seat.name = currentUser.name; await saveRoomToFirebase(roomId, room); }
-                    });
+                    Swal.fire({ title: 'จองที่นั่งนี้?', showCancelButton: true }).then(r => { if(r.isConfirmed) { seat.bookedBy = currentUser.email; seat.name = currentUser.name; saveDB(); renderSeatMap(); }});
                 }
             }
-        };
+        }
 
         // --- ระบบ Drag (ลากโต๊ะ) ---
         let activeSeatId = null, isDragging = false, startX, startY, initialLeft, initialTop;
-        
-        window.initDrag = function(e, seatId) {
+        function initDrag(e, seatId) {
             activeSeatId = seatId; isDragging = false;
             startX = e.clientX || (e.touches && e.touches[0].clientX);
             startY = e.clientY || (e.touches && e.touches[0].clientY);
             const el = document.getElementById('seat-' + seatId);
             initialLeft = parseInt(el.style.left) || 0; initialTop = parseInt(el.style.top) || 0;
             el.classList.add('dragging');
-        };
-        
+        }
         document.addEventListener('mousemove', handleMove, {passive: false});
         document.addEventListener('touchmove', handleMove, {passive: false});
-        
         function handleMove(e) {
             if (!activeSeatId || !currentUser.isAdmin) return;
             const currentX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -389,39 +368,21 @@
                 el.style.left = (initialLeft + dx) + 'px'; el.style.top = (initialTop + dy) + 'px';
             }
         }
-        
         document.addEventListener('mouseup', handleUp);
         document.addEventListener('touchend', handleUp);
-        
-        async function handleUp() {
+        function handleUp() {
             if (!activeSeatId) return;
             const el = document.getElementById('seat-' + activeSeatId);
             el.classList.remove('dragging');
             if (isDragging) {
-                const room = classroomsDB[activeRoom];
-                const seat = room.seats.find(s => s.id === activeSeatId);
-                seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top); 
-                await saveRoomToFirebase(activeRoom, room);
-            } else { 
-                window.handleSeatClick(activeRoom, activeSeatId); 
-            }
+                const seat = classroomsDB[activeRoom].seats.find(s => s.id === activeSeatId);
+                seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top); saveDB();
+            } else { handleSeatClick(activeRoom, activeSeatId); }
             activeSeatId = null; isDragging = false;
         }
 
-        window.toggleBooking = async function() { 
-            const room = classroomsDB[activeRoom];
-            room.isBookingOpen = !room.isBookingOpen; 
-            await saveRoomToFirebase(activeRoom, room); 
-        };
-        
-        window.resetSeatLayout = async function() { 
-            const room = classroomsDB[activeRoom];
-            applyDefaultLayout(room.seats); 
-            await saveRoomToFirebase(activeRoom, room); 
-        };
-
-        // เพื่อป้องกันปัญหา HTML ไม่รู้จักตัวแปรที่ใช้งานใน inline function บางจุด
-        window.activeRoom = activeRoom;
+        function toggleBooking() { classroomsDB[activeRoom].isBookingOpen = !classroomsDB[activeRoom].isBookingOpen; saveDB(); renderSeatMap(); }
+        function resetSeatLayout() { applyDefaultLayout(classroomsDB[activeRoom].seats); saveDB(); renderSeatMap(); }
     </script>
 </body>
 </html>
