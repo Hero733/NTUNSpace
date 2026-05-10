@@ -73,6 +73,7 @@
 
     <script>
         const ADMIN_EMAILS = ['ntun21933@ntun.ac.th'];
+        const SESSION_KEY = 'ntunUserSession'; // คีย์สำหรับเก็บข้อมูลล็อกอิน
         let currentUser = null;
         let activeRoom = null;
 
@@ -94,6 +95,14 @@
         }
 
         function saveDB() { localStorage.setItem('ntunClassroomsDB', JSON.stringify(classroomsDB)); }
+        
+        // ฟังก์ชันอัปเดต Session
+        function saveSession() {
+            localStorage.setItem(SESSION_KEY, JSON.stringify({
+                user: currentUser,
+                expiry: Date.now() + (24 * 60 * 60 * 1000) // อยู่ได้ 24 ชั่วโมง
+            }));
+        }
 
         function applyDefaultLayout(seats) {
             const colX = [0, 85, 170,  295, 380, 465,  590, 675]; 
@@ -113,23 +122,23 @@
             return applyDefaultLayout(seats);
         }
 
-        // ลบระบบสร้างห้องเทสอัตโนมัติออกแล้ว 
         if (Object.keys(classroomsDB).length === 0) {
             classroomsDB = {}; 
             saveDB();
         }
-        
         patchDatabase();
 
-        function handleGoogleLogin(response) {
-            const payload = JSON.parse(decodeURIComponent(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))));
-            const email = payload.email;
-            const isAdmin = ADMIN_EMAILS.includes(email);
-            
-            if (!email.endsWith('@ntun.ac.th') && !isAdmin) {
-                return Swal.fire('ไม่อนุญาต', 'ใช้อีเมล @ntun.ac.th เท่านั้น', 'error');
-            }
-            currentUser = { email, name: isAdmin ? "แอดมินสูงสุด" : payload.name, isAdmin };
+        // ตรวจสอบ Session ตอนเปิดเว็บ
+        const sessionData = JSON.parse(localStorage.getItem(SESSION_KEY));
+        if (sessionData && sessionData.expiry > Date.now()) {
+            currentUser = sessionData.user;
+            if (!currentUser.joinedRooms) currentUser.joinedRooms = []; // อัปเดตโครงสร้างเก่า
+            showMainApp();
+        } else {
+            localStorage.removeItem(SESSION_KEY); // ลบถ้าหมดอายุ
+        }
+
+        function showMainApp() {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userEmailDisplay').innerText = currentUser.email;
@@ -140,7 +149,23 @@
             renderDashboard();
         }
 
-        function logout() { location.reload(); }
+        function handleGoogleLogin(response) {
+            const payload = JSON.parse(decodeURIComponent(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))));
+            const email = payload.email;
+            const isAdmin = ADMIN_EMAILS.includes(email);
+            
+            if (!email.endsWith('@ntun.ac.th') && !isAdmin) {
+                return Swal.fire('ไม่อนุญาต', 'ใช้อีเมล @ntun.ac.th เท่านั้น', 'error');
+            }
+            currentUser = { email, name: isAdmin ? "แอดมินสูงสุด" : payload.name, isAdmin, joinedRooms: [] };
+            saveSession(); // บันทึก Session ตอนล็อกอิน
+            showMainApp();
+        }
+
+        function logout() { 
+            localStorage.removeItem(SESSION_KEY); // ลบ Session ทิ้ง
+            location.reload(); 
+        }
 
         function renderDashboard() {
             document.getElementById('headerTitle').innerText = "หน้าหลัก";
@@ -158,13 +183,35 @@
                     <div id="teacherRoomsList" class="flex flex-col gap-4"></div>`;
                 renderTeacherRoomsList();
             } else {
+                // ส่วนของนักเรียน เพิ่ม "ห้องเรียนที่เคยเข้า"
+                let joinedRoomsHTML = '';
+                if (currentUser.joinedRooms && currentUser.joinedRooms.length > 0) {
+                    joinedRoomsHTML = `<div class="mt-8 text-left w-full"><h4 class="font-bold text-gray-700 mb-3 px-2">ประวัติห้องเรียน</h4><div class="flex flex-col gap-3">`;
+                    currentUser.joinedRooms.forEach(code => {
+                        const room = classroomsDB[code];
+                        if (room) {
+                            joinedRoomsHTML += `
+                                <div class="glass-panel p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-white/40 shadow-sm" onclick="joinRoom('${code}')">
+                                    <div>
+                                        <h5 class="font-bold text-gray-800">${room.name}</h5>
+                                        <span class="text-xs text-blue-600 font-bold">รหัส: ${code}</span>
+                                    </div>
+                                    <div class="bg-blue-50 p-2 rounded-full"><i class='bx bx-chevron-right text-xl text-blue-500'></i></div>
+                                </div>
+                            `;
+                        }
+                    });
+                    joinedRoomsHTML += `</div></div>`;
+                }
+
                 content.innerHTML = `
-                    <div class="glass-panel p-8 rounded-[32px] text-center mt-10">
+                    <div class="glass-panel p-8 rounded-[32px] text-center mt-6">
                         <div class="w-20 h-20 bg-blue-500 text-white rounded-[24px] flex items-center justify-center mx-auto mb-6"><i class='bx bx-door-open text-4xl'></i></div>
                         <h3 class="font-extrabold text-2xl mb-2 text-gray-800">เข้าร่วมชั้นเรียน</h3>
                         <p class="text-sm text-gray-500 mb-6 font-medium">กรุณากรอกรหัสห้องเรียน 6 หลักเพื่อเข้าใช้งาน</p>
                         <input type="text" id="roomCodeInput" maxlength="6" placeholder="______" class="w-full text-center tracking-[8px] uppercase font-mono font-bold text-3xl p-4 bg-white/70 border border-white rounded-2xl mb-6">
-                        <button onclick="joinRoom()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-4 rounded-2xl shadow-lg">เข้าร่วม (Join)</button>
+                        <button onclick="joinRoom()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:scale-[1.02] transition">เข้าร่วม (Join)</button>
+                        ${joinedRoomsHTML}
                     </div>`;
             }
         }
@@ -186,7 +233,7 @@
                             <h4 class="font-extrabold text-gray-800">${r.name}</h4>
                             <p class="text-xs text-blue-600 font-bold mt-1">Code: ${code} <span class="text-gray-400 font-normal ml-2">(${r.seats.length} โต๊ะ)</span></p>
                         </div>
-                        <button onclick="event.stopPropagation(); deleteRoom('${code}')" class="bg-red-100 text-red-600 p-3 rounded-xl"><i class='bx bx-trash text-xl'></i></button>
+                        <button onclick="event.stopPropagation(); deleteRoom('${code}')" class="bg-red-100 text-red-600 p-3 rounded-xl hover:bg-red-200 transition"><i class='bx bx-trash text-xl'></i></button>
                     </div>`;
             }
             document.getElementById('teacherRoomsList').innerHTML = html;
@@ -198,9 +245,22 @@
             });
         }
 
-        function joinRoom() {
-            const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
-            if (classroomsDB[code]) { activeRoom = code; renderSeatMap(); }
+        function joinRoom(directCode = null) {
+            const code = directCode || document.getElementById('roomCodeInput').value.trim().toUpperCase();
+            if (classroomsDB[code]) { 
+                activeRoom = code; 
+                
+                // บันทึกประวัติการเข้าห้องเรียนของนักเรียน
+                if (!currentUser.isAdmin) {
+                    if (!currentUser.joinedRooms) currentUser.joinedRooms = [];
+                    if (!currentUser.joinedRooms.includes(code)) {
+                        currentUser.joinedRooms.push(code);
+                        saveSession(); // อัปเดต Session ให้จำห้อง
+                    }
+                }
+                
+                renderSeatMap(); 
+            }
             else Swal.fire('ไม่พบห้อง', 'รหัสไม่ถูกต้อง', 'error');
         }
 
