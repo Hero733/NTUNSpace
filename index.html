@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NTUN Space - iPhone 17 Pro Edition</title>
+    <title>NTUN Space - Professional Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,144 +14,137 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        :root {
-            --ios-accent: #30d158; /* Green from your image */
-            --ios-bg: #4a69bd;
-            --glass: rgba(255, 255, 255, 0.12);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
         body { 
             font-family: 'Kanit', sans-serif; 
-            background: linear-gradient(160deg, #5758bb 0%, #4b6cb7 50%, #182848 100%);
-            background-attachment: fixed;
+            background: #5d81d3;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(100, 149, 237, 0.5) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(72, 61, 139, 0.3) 0px, transparent 50%),
+                url('https://www.transparenttextures.com/patterns/stardust.png'); /* เพิ่มละอองดาวแบบในรูป */
             min-height: 100vh;
             color: white;
-            overflow-x: hidden;
+            padding-bottom: 50px;
         }
 
-        /* Mesh Gradient background like the image */
-        .mesh-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(at 0% 0%, rgba(104, 109, 224, 0.4) 0, transparent 50%),
-                        radial-gradient(at 100% 100%, rgba(149, 175, 192, 0.3) 0, transparent 50%);
-            z-index: -1;
-        }
-
-        /* iOS Glass Styling */
-        .ios-glass {
-            background: var(--glass);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-        }
-
-        .ios-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 35px;
-            transition: all 0.4s cubic-bezier(0.15, 0.83, 0.66, 1);
-        }
-        .ios-card:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.02); }
-
-        /* Progress Bar like the image */
-        .progress-container {
-            width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%; background: linear-gradient(90deg, #32ff7e, #30d158);
-            box-shadow: 0 0 15px rgba(48, 209, 88, 0.5); border-radius: 10px;
-        }
-
-        /* Navigation Style from your image */
-        .nav-pill {
+        /* Glassmorphism Capsule */
+        .glass-pill {
             background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 50px;
-            padding: 8px 20px;
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .glass-pill:hover { background: rgba(255, 255, 255, 0.25); }
+
+        /* การ์ดแบบในรูป */
+        .main-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 40px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
         }
 
-        /* Custom Input */
-        .ios-input {
-            background: rgba(0, 0, 0, 0.2); border: none; border-radius: 15px;
-            padding: 12px 20px; color: white; width: 100%;
+        /* ปุ่มสถานะสีเขียวแบบในรูป */
+        .status-badge {
+            background: rgba(48, 209, 88, 0.2);
+            color: #32ff7e;
+            border: 1px solid rgba(48, 209, 88, 0.4);
+            border-radius: 50px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        /* Room Map Logic */
-        .map-viewport {
-            width: 100%; overflow: auto; border-radius: 30px; background: rgba(0,0,0,0.2);
-            scrollbar-width: none; -ms-overflow-style: none;
+        /* Progress Bar นีออน */
+        .progress-rail {
+            width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden;
         }
-        #roomMap { 
-            position: relative; width: 1100px; height: 900px; padding: 50px;
-            transform-origin: top left;
-        }
-
-        /* Desk Styling iPhone Style */
-        .desk-container { width: 80px; height: 90px; position: absolute; transition: transform 0.2s; }
-        .desk-top { fill: rgba(255,255,255,0.95); rx: 12; }
-        .desk-chair { fill: rgba(255,255,255,0.3); rx: 10; }
-        .booked .desk-top { fill: #ff453a; } /* iOS Red */
-        .my-seat .desk-top { fill: var(--ios-accent); }
-        .desk-label { 
-            position: absolute; top: 15%; width: 100%; text-align: center; 
-            font-size: 11px; font-weight: 600; color: #1c1c1e;
+        .progress-bar {
+            height: 100%; background: linear-gradient(90deg, #32ff7e, #30d158);
+            border-radius: 20px; box-shadow: 0 0 15px rgba(48, 209, 88, 0.6);
         }
 
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-ui { animation: fadeIn 0.6s ease forwards; }
+        /* Desk UI (Minimalist & Clean) */
+        .desk { cursor: pointer; transition: 0.2s; }
+        .desk:active { transform: scale(0.9); }
+        .desk-top { fill: #ffffff; rx: 12; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        .booked .desk-top { fill: #ff453a; }
+        .my-seat .desk-top { fill: #30d158; }
+        .desk-label { font-size: 11px; font-weight: 700; fill: #1c1c1e; pointer-events: none; }
 
-        /* Mobile Scale */
-        @media (max-width: 768px) {
-            #roomMap { transform: scale(0.6); }
-            .mobile-nav { padding: 10px; }
+        /* Responsive Map */
+        .map-container {
+            width: 100%; overflow: auto; border-radius: 35px;
+            background: rgba(0,0,0,0.05); scrollbar-width: none;
+        }
+        #roomMap { position: relative; width: 1100px; height: 850px; transform-origin: top center; }
+
+        @media (max-width: 768px) { #roomMap { transform: scale(0.65); height: 550px; } }
+        @media (max-width: 480px) { #roomMap { transform: scale(0.48); height: 420px; } }
+
+        /* SweetAlert Glass */
+        .swal2-popup.hero-ui {
+            background: rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(40px) !important;
+            border-radius: 45px !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            color: white !important;
         }
     </style>
 </head>
 <body>
 
-    <div class="mesh-bg"></div>
-
-    <div id="loginPage" class="fixed inset-0 z-[100] flex items-center justify-center p-8">
-        <div class="ios-glass p-12 w-full max-w-md text-center border-white/40">
-            <div class="w-24 h-24 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-[2.5rem] mx-auto mb-8 flex items-center justify-center text-white text-5xl shadow-2xl">
-                <i class='bx bxs-shapes'></i>
+    <div id="loginPage" class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#5d81d3]">
+        <div class="main-card w-full max-w-md text-center">
+            <div class="w-24 h-24 bg-white/20 rounded-[2.5rem] mx-auto mb-8 flex items-center justify-center text-white text-5xl border border-white/30 shadow-xl">
+                <i class='bx bxs-dashboard'></i>
             </div>
-            <h1 class="text-4xl font-bold mb-2 tracking-tight">NTUN Space</h1>
-            <p class="text-white/50 mb-10 font-light">The Future of Classroom Management</p>
+            <h1 class="text-4xl font-bold mb-2">NTUN Space</h1>
+            <p class="text-white/60 mb-10">Classroom & Club Management</p>
             <div id="g_id_onload" data-client_id="738644222886-o9uq6eonuu9hp8srsad1465lh9id41kj.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
             <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill" data-size="large" data-theme="filled_blue"></div>
         </div>
     </div>
 
-    <div id="mainApp" class="hidden min-h-screen flex flex-col p-4 md:p-10 max-w-7xl mx-auto animate-ui">
-        <header class="flex flex-wrap justify-between items-center gap-4 mb-12">
-            <div class="nav-pill flex items-center gap-3">
-                <img src="https://upload.wikimedia.org/wikipedia/th/thumb/f/f4/Emblem_of_Nawaminthrachinuthit_Triam_Udom_Suksa_Nomklao_School.png/220px-Emblem_of_Nawaminthrachinuthit_Triam_Udom_Suksa_Nomklao_School.png" class="w-8 h-8 object-contain">
-                <div class="hidden sm:block">
-                    <p class="text-[10px] font-bold opacity-70 leading-none">ระบบลงทะเบียนชุมนุม</p>
-                    <p class="text-[9px] opacity-50">โรงเรียนนวมินทราชินูทิศ เตรียมอุดมศึกษาน้อมเกล้า</p>
-                </div>
+    <div id="mainApp" class="hidden min-h-screen max-w-6xl mx-auto px-4 pt-8">
+        <header class="flex justify-between items-center mb-16">
+            <div class="glass-pill px-6 py-3 flex items-center gap-3">
+                <i class='bx bxs-school text-2xl'></i>
+                <div class="h-6 w-[1px] bg-white/20"></div>
+                <span class="text-sm font-bold tracking-tight">ระบบลงทะเบียนเรียน</span>
             </div>
-
+            
             <div class="flex items-center gap-3">
-                <div class="nav-pill flex items-center gap-4">
-                    <img id="userImg" src="" class="w-10 h-10 rounded-full border-2 border-white/30 object-cover shadow-sm">
-                    <div class="text-left pr-2">
-                        <p id="userName" class="text-sm font-bold leading-none">User</p>
-                        <span id="userRole" class="text-[9px] opacity-60 uppercase font-black">Role</span>
-                    </div>
+                <div class="hidden md:flex glass-pill px-6 py-3 items-center gap-3">
+                    <i class='bx bxs-grid-alt'></i> <span>แดชบอร์ด</span>
                 </div>
-                <button id="manageUserBtn" onclick="showUserManagement()" class="hidden w-12 h-12 ios-glass flex items-center justify-center text-xl text-white/80 hover:bg-white/20 transition-all"><i class='bx bxs-cog'></i></button>
-                <button onclick="logout()" class="nav-pill bg-red-500/20 text-red-300 font-bold text-sm">ออก</button>
+                <div class="glass-pill pl-2 pr-5 py-2 flex items-center gap-3">
+                    <img id="userImg" src="" class="w-9 h-9 rounded-full object-cover border border-white/30">
+                    <span id="userNameSmall" class="text-sm font-bold">User</span>
+                    <button onclick="logout()" class="ml-2 text-white/50 hover:text-white"><i class='bx bx-log-out-circle text-xl'></i></button>
+                </div>
             </div>
         </header>
+
+        <section class="mb-12">
+            <p class="text-white/60 text-lg ml-1 font-light">ยินดีต้อนรับกลับมา</p>
+            <h1 id="heroName" class="text-6xl font-bold mb-5">สวัสดี, User</h1>
+            <div class="glass-pill inline-flex items-center gap-2 px-4 py-2 text-[12px] font-bold text-white/80 border-white/10 uppercase tracking-widest">
+                <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                ช่วงที่ 2A — ลงทะเบียนชุมนุม
+            </div>
+        </section>
 
         <div id="contentArea"></div>
     </div>
 
     <script>
+        // --- Firebase & Auth ---
         const firebaseConfig = {
             apiKey: "AIzaSyAlaTyhtXf-d6qDSD5AeWR33Hg3VCn55o8",
             authDomain: "ntunspace.firebaseapp.com",
@@ -177,7 +170,7 @@
         async function handleGoogleLogin(response) {
             const payload = parseJwt(response.credential);
             const email = payload.email.toLowerCase();
-            if (!email.endsWith('@ntun.ac.th')) return Swal.fire({icon:'error', title:'Email Error', text:'กรุณาใช้เมลโรงเรียน', customClass:{popup:'swal2-popup hero-card'}});
+            if (!email.endsWith('@ntun.ac.th')) return Swal.fire({icon:'error', title:'Email Error', text:'@ntun.ac.th เท่านั้น', customClass:{popup:'swal2-popup hero-ui'}});
 
             let role = 'student';
             const userDoc = await db.collection("users").doc(email).get();
@@ -185,21 +178,19 @@
             else if (userDoc.exists) role = userDoc.data().role;
 
             currentUser = { email, name: payload.name, role, picture: payload.picture };
-            localStorage.setItem('ntun_v17', JSON.stringify(currentUser));
+            localStorage.setItem('ntun_final_v1', JSON.stringify(currentUser));
             initApp();
         }
 
-        const saved = localStorage.getItem('ntun_v17');
+        const saved = localStorage.getItem('ntun_final_v1');
         if (saved) { currentUser = JSON.parse(saved); initApp(); }
 
         function initApp() {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userName').innerText = currentUser.name;
+            document.getElementById('heroName').innerText = `สวัสดี, ${currentUser.name.split(' ')[0]}`;
+            document.getElementById('userNameSmall').innerText = currentUser.name.split(' ')[0];
             document.getElementById('userImg').src = currentUser.picture;
-            document.getElementById('userRole').innerText = currentUser.role;
-
-            if (['super_admin', 'admin'].includes(currentUser.role)) document.getElementById('manageUserBtn').classList.remove('hidden');
 
             db.collection("classrooms").onSnapshot(snap => {
                 classrooms = {};
@@ -216,42 +207,40 @@
         function renderDashboard() {
             const area = document.getElementById('contentArea');
             const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-            let html = `<div class="mb-8"><p class="text-white/40 text-sm font-light mb-1">ยินดีต้อนรับกลับมา</p><h1 class="text-5xl font-bold">สวัสดี, ${currentUser.name.split(' ')[0]}</h1><div class="mt-4 nav-pill inline-block text-[10px] font-bold uppercase tracking-widest text-green-400 border-green-500/30">ช่วงที่ 2A — ลงทะเบียนชุมนุม</div></div>`;
+            let html = `<div class="flex items-center gap-3 mb-8"><i class='bx bxs-grid text-2xl text-white/50'></i> <h2 class="text-2xl font-bold">ชุมนุมของฉัน</h2></div>`;
 
             if (isAdmin) {
                 html += `
-                <div class="ios-glass p-8 mb-10 flex flex-wrap gap-4 items-end">
-                    <div class="flex-1 min-w-[200px]"><label class="text-[10px] font-bold opacity-50 ml-2 mb-2 block">ชื่อชุมนุม / ห้องเรียน</label><input id="roomName" type="text" placeholder="เช่น ชุมนุมโปรแกรมมิ่ง" class="ios-input"></div>
-                    <div class="w-32"><label class="text-[10px] font-bold opacity-50 ml-2 mb-2 block">จำนวนที่นั่ง</label><input id="roomCount" type="number" value="40" class="ios-input text-center"></div>
-                    <button onclick="createRoom()" class="ios-glass bg-white/20 px-8 py-3 font-bold hover:bg-white/30 transition-all">สร้างระบบ</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
-                for (const id in classrooms) {
-                    const c = classrooms[id];
-                    const booked = c.seats.filter(s => s.bookedBy).length;
-                    const percent = (booked / c.seats.length) * 100;
-                    html += `
-                    <div onclick="openRoom('${id}')" class="ios-card p-8 cursor-pointer relative overflow-hidden group">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="text-4xl opacity-80 group-hover:scale-110 transition-transform"><i class='bx bxs-folder-plus'></i></div>
-                            <button onclick="event.stopPropagation(); deleteRoom('${id}')" class="text-white/20 hover:text-red-400"><i class='bx bx-trash text-xl'></i></button>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-1">${c.name}</h3>
-                        <p class="text-white/40 text-[10px] uppercase font-bold mb-6 tracking-widest">ID: ${id}</p>
-                        <div class="flex justify-between items-end mb-2"><span class="text-xs font-bold opacity-80">สมาชิก</span><span class="text-xs font-bold">${booked} / ${c.seats.length} คน</span></div>
-                        <div class="progress-container"><div class="progress-fill" style="width: ${percent}%"></div></div>
-                    </div>`;
-                }
-                html += `</div>`;
-            } else {
-                html += `
-                <div class="max-w-md mx-auto ios-glass p-10 text-center mt-12">
-                    <div class="text-5xl mb-6 opacity-30"><i class='bx bxs-key'></i></div>
-                    <h3 class="text-2xl font-bold mb-6">กรอกรหัสเพื่อเข้าจอง</h3>
-                    <input id="roomCodeInput" type="text" placeholder="รหัส 6 หลัก" class="ios-input text-center text-2xl font-black uppercase tracking-[8px] mb-6 h-16">
-                    <button onclick="joinRoom()" class="w-full ios-glass bg-blue-500 py-4 font-bold text-lg hover:bg-blue-400 transition-all">ยืนยัน</button>
+                <div class="main-card mb-10 flex flex-wrap gap-4 items-end">
+                    <div class="flex-1 min-w-[200px]"><label class="text-xs font-bold opacity-50 mb-2 block uppercase tracking-wider">ชื่อชุมนุม / ห้อง</label><input id="roomName" type="text" placeholder="ระบุชื่อ..." class="w-full bg-white/10 border-none rounded-2xl p-4 text-white placeholder:text-white/20"></div>
+                    <div class="w-32"><label class="text-xs font-bold opacity-50 mb-2 block uppercase tracking-wider">ที่นั่ง</label><input id="roomCount" type="number" value="40" class="w-full bg-white/10 border-none rounded-2xl p-4 text-center"></div>
+                    <button onclick="createRoom()" class="glass-pill bg-white/20 px-8 py-4 font-bold"><i class='bx bx-plus-circle'></i> สร้าง</button>
+                    <button onclick="showUserManagement()" class="glass-pill bg-blue-500/50 border-blue-400 px-6 py-4 font-bold ml-auto"><i class='bx bxs-user-badge'></i> จัดการยศ</button>
                 </div>`;
             }
+
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-8">`;
+            for (const id in classrooms) {
+                const c = classrooms[id];
+                const booked = c.seats.filter(s => s.bookedBy).length;
+                const percent = (booked / c.seats.length) * 100;
+                const isMyRoom = c.seats.some(s => s.bookedBy === currentUser.email);
+
+                html += `
+                <div onclick="openRoom('${id}')" class="main-card group cursor-pointer hover:bg-white/15 transition-all">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="text-lg font-bold tracking-tight">${c.name}</div>
+                        ${isMyRoom ? `<div class="status-badge"><i class='bx bxs-check-circle'></i> ลงทะเบียนแล้ว</div>` : `<div class="text-xs font-bold opacity-30 uppercase tracking-widest">ว่าง ${c.seats.length - booked} ที่</div>`}
+                    </div>
+                    <p class="text-white/40 text-sm mb-10 font-light">พัฒนาซอฟต์แวร์และแอปพลิเคชัน เรียนรู้คอมพิวเตอร์ Python, JavaScript และอื่นๆ พร้อมทำโปรเจกต์จริง</p>
+                    <div class="flex justify-between text-xs font-bold mb-3 uppercase tracking-tighter">
+                        <span class="opacity-60 text-sm">สมาชิก</span>
+                        <span>${booked} / ${c.seats.length} คน</span>
+                    </div>
+                    <div class="progress-rail"><div class="progress-bar" style="width: ${percent}%"></div></div>
+                </div>`;
+            }
+            html += `</div>`;
             area.innerHTML = html;
         }
 
@@ -262,32 +251,43 @@
             
             area.innerHTML = `
                 <div class="flex justify-between items-center mb-8">
-                    <button onclick="activeRoomId=null; renderUI()" class="nav-pill flex items-center gap-2 font-bold text-sm hover:bg-white/30"><i class='bx bx-chevron-left'></i> กลับ</button>
-                    <div class="nav-pill bg-white/10 text-[11px] font-black uppercase tracking-widest border-white/10">${room.name}</div>
+                    <button onclick="activeRoomId=null; renderUI()" class="glass-pill px-6 py-3 flex items-center gap-2 font-bold text-sm"><i class='bx bx-left-arrow-alt'></i> กลับสู่แดชบอร์ด</button>
+                    <div class="glass-pill px-6 py-3 font-bold text-sm bg-white/5 uppercase tracking-widest border-white/5">ROOM ID: ${activeRoomId}</div>
                 </div>
-                <div class="map-viewport ios-glass p-10">
-                    <div class="flex flex-col items-center mb-16 opacity-30">
-                        <div class="w-96 h-1 bg-white/20 rounded-full mb-4"></div>
-                        <p class="text-[10px] font-bold tracking-[15px] uppercase">Whiteboard Zone</p>
-                    </div>
-                    <div id="roomMap">
-                        ${room.seats.map(s => {
-                            let state = '', display = s.id;
-                            if (s.bookedBy) {
-                                if (s.bookedBy === currentUser.email) { state = 'my-seat'; display = "YOU"; }
-                                else { state = 'booked'; display = isAdmin ? s.name.split(' ')[0] : 'จองแล้ว'; }
-                            }
-                            return `
-                            <div id="desk-${s.id}" class="desk-container ${state}" style="left:${s.x}px; top:${s.y}px;" onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
-                                <svg viewBox="0 0 100 110">
-                                    <rect x="25" y="80" width="50" height="25" class="desk-chair" />
-                                    <rect x="5" y="10" width="90" height="65" class="desk-top" />
-                                </svg>
-                                <div class="desk-label">${display}</div>
-                            </div>`;
-                        }).join('')}
+                <div class="main-card p-4 overflow-hidden">
+                    <div class="map-container">
+                        <div class="w-full flex justify-center py-10 opacity-20 pointer-events-none">
+                            <div class="w-96 h-1 bg-white rounded-full shadow-[0_0_20px_#fff]"></div>
+                        </div>
+                        <div id="roomMap">
+                            ${room.seats.map(s => {
+                                let state = '', display = s.id;
+                                if (s.bookedBy) {
+                                    if (s.bookedBy === currentUser.email) { state = 'my-seat'; display = "YOU"; }
+                                    else { state = 'booked'; display = isAdmin ? s.name.split(' ')[0] : 'FULL'; }
+                                }
+                                return `
+                                <svg id="desk-${s.id}" class="desk ${state}" style="position:absolute; left:${s.x}px; top:${s.y}px;" width="85" height="95" onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
+                                    <rect x="15" y="75" width="55" height="15" rx="6" fill="rgba(255,255,255,0.2)" />
+                                    <rect x="0" y="5" width="85" height="65" class="desk-top" />
+                                    <text x="42" y="42" text-anchor="middle" class="desk-label">${display}</text>
+                                </svg>`;
+                            }).join('')}
+                        </div>
                     </div>
                 </div>`;
+        }
+
+        // --- Logic & Database ---
+        function calculatePositions(count) {
+            const seats = [];
+            for (let i = 0; i < count; i++) {
+                const row = Math.floor(i / 8), col = i % 8;
+                let x = col * 115;
+                if (col >= 3) x += 80; if (col >= 6) x += 80;
+                seats.push({ id: i + 1, x: x + 60, y: row * 125 + 100, bookedBy: null, name: null });
+            }
+            return seats;
         }
 
         async function createRoom() {
@@ -295,37 +295,36 @@
             const count = parseInt(document.getElementById('roomCount').value);
             if (!name || !count) return;
             const id = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const seats = [];
-            for (let i = 0; i < count; i++) {
-                const row = Math.floor(i / 8), col = i % 8;
-                let x = col * 110;
-                if (col >= 3) x += 80; if (col >= 6) x += 80;
-                seats.push({ id: i + 1, x: x + 50, y: row * 120 + 50, bookedBy: null, name: null });
+            await db.collection("classrooms").doc(id).set({ name, seats: calculatePositions(count) });
+        }
+
+        function openRoom(id) { activeRoomId = id; renderUI(); }
+        
+        async function handleBooking(sid) {
+            const room = classrooms[activeRoomId];
+            const seat = room.seats.find(s => s.id === sid);
+            const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
+            if (seat.bookedBy) {
+                if (seat.bookedBy === currentUser.email || isAdmin) {
+                    Swal.fire({ title: 'ยกเลิกการจอง?', icon: 'warning', showCancelButton: true, customClass: {popup: 'hero-ui'} })
+                    .then(r => { if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats }); }});
+                }
+            } else {
+                if (!isAdmin && room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire({icon: 'info', title: 'คุณจองไปแล้วครับ', customClass:{popup:'hero-ui'}});
+                seat.bookedBy = currentUser.email; seat.name = currentUser.name;
+                db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
             }
-            await db.collection("classrooms").doc(id).set({ name, seats });
         }
 
-        function joinRoom() {
-            const code = document.getElementById('roomCodeInput').value.toUpperCase();
-            if (classrooms[code]) { activeRoomId = code; renderUI(); }
-            else Swal.fire({icon:'error', title:'ไม่พบรหัสนี้', customClass:{popup:'swal2-popup hero-card'}});
-        }
-
-        function deleteRoom(id) {
-            Swal.fire({title:'ลบระบบนี้?', icon:'warning', showCancelButton:true, customClass:{popup:'swal2-popup hero-card'}}).then(r => {
-                if(r.isConfirmed) db.collection("classrooms").doc(id).delete();
-            });
-        }
-
+        // --- Drag & Drop ---
         let dragId = null, isMoving = false, startX, startY, initX, initY;
         function startDrag(e, id) {
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
             dragId = id; isMoving = false;
             const ev = e.touches ? e.touches[0] : e;
             startX = ev.clientX; startY = ev.clientY;
             const el = document.getElementById('desk-'+id);
             initX = parseInt(el.style.left); initY = parseInt(el.style.top);
-            if(isAdmin) el.style.zIndex = 100;
         }
 
         document.addEventListener('mousemove', e => {
@@ -341,65 +340,53 @@
 
         document.addEventListener('mouseup', () => {
             if(!dragId) return;
-            const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
-            if(isMoving && isAdmin) {
+            if(isMoving) {
                 const el = document.getElementById('desk-'+dragId);
                 const room = classrooms[activeRoomId];
                 const seat = room.seats.find(s => s.id === dragId);
                 seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top);
                 db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
-            } else if(!isMoving) handleBooking(dragId);
+            } else handleBooking(dragId);
             dragId = null;
         });
 
-        async function handleBooking(sid) {
-            const room = classrooms[activeRoomId];
-            const seat = room.seats.find(s => s.id === sid);
-            const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
-            if (seat.bookedBy) {
-                if (seat.bookedBy === currentUser.email || isAdmin) {
-                    Swal.fire({ title: 'ยกเลิกการจอง?', icon: 'question', showCancelButton: true, customClass: {popup: 'swal2-popup hero-card'} })
-                    .then(r => { if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats }); }});
-                }
-            } else {
-                if (!isAdmin && room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire({icon: 'warning', title: 'จองซ้ำ', text:'คุณมีที่จองไว้แล้ว 1 ที่ครับ'});
-                seat.bookedBy = currentUser.email; seat.name = currentUser.name;
-                db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
-            }
-        }
-
+        // --- User Management (Original Request) ---
         async function showUserManagement() {
             const snap = await db.collection("users").get();
             let rows = '';
             snap.forEach(doc => {
                 if (doc.id !== SUPER_ADMIN) {
-                    rows += `<div class="flex justify-between items-center bg-white/10 p-4 rounded-2xl mb-2"><div><p class="text-sm font-bold">${doc.id}</p><p class="text-[9px] opacity-50 uppercase">${doc.data().role}</p></div><button onclick="removeUser('${doc.id}')" class="text-red-400"><i class='bx bx-x-circle text-2xl'></i></button></div>`;
+                    rows += `
+                    <div class="flex justify-between items-center bg-white/5 p-4 rounded-3xl mb-3 border border-white/5">
+                        <div class="text-left"><p class="text-xs font-bold">${doc.id}</p><p class="text-[9px] opacity-40 font-black uppercase tracking-widest">${doc.data().role}</p></div>
+                        <button onclick="removeUser('${doc.id}')" class="w-10 h-10 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all"><i class='bx bx-trash'></i></button>
+                    </div>`;
                 }
             });
             Swal.fire({
-                title: 'User Access Control',
+                title: 'จัดการผู้ดูแลระบบ',
                 html: `
-                    <div class="mb-6"><input id="swalEmail" placeholder="email @ntun.ac.th" class="ios-input mb-2"><select id="swalRole" class="ios-input"><option value="teacher">Teacher</option><option value="admin">Admin</option></select></div>
-                    <button id="addBtn" class="w-full ios-glass bg-white/20 py-3 mb-6 font-bold">เพิ่มสมาชิกใหม่</button>
-                    <div class="max-h-60 overflow-y-auto text-left">${rows || '<p class="text-center opacity-30">No other users</p>'}</div>`,
-                showConfirmButton: false, showCancelButton: true, customClass:{popup:'swal2-popup hero-card'},
+                    <div class="mb-6"><input id="swalEmail" placeholder="อีเมล @ntun.ac.th" class="w-full bg-white/10 rounded-2xl p-4 text-white mb-3 border-none"><select id="swalRole" class="w-full bg-indigo-900/50 rounded-2xl p-4 text-white border-none"><option value="teacher">Teacher (คุณครู)</option><option value="admin">Admin (ผู้ดูแล)</option></select></div>
+                    <button id="addBtn" class="glass-pill w-full py-4 mb-6 bg-blue-500 border-none font-bold">เพิ่มสมาชิกใหม่</button>
+                    <div class="max-h-64 overflow-y-auto pr-2">${rows || '<p class="opacity-20 py-10">ไม่พบรายชื่อผู้ดูแล</p>'}</div>
+                `,
+                showConfirmButton: false, showCancelButton: true, customClass:{popup:'hero-ui'},
                 didOpen: () => {
                     document.getElementById('addBtn').onclick = async () => {
                         const email = document.getElementById('swalEmail').value.trim().toLowerCase();
                         if(!email.endsWith('@ntun.ac.th')) return;
-                        await db.collection("users").doc(email).set({ role: document.getElementById('swalRole').value, name: "Pending User" });
+                        await db.collection("users").doc(email).set({ role: document.getElementById('swalRole').value, name: "New Member" });
                         Swal.close(); showUserManagement();
                     };
                 }
             });
         }
-
         async function removeUser(email) {
             await db.collection("users").doc(email).delete();
             Swal.close(); showUserManagement();
         }
 
-        function logout() { localStorage.removeItem('ntun_v17'); location.reload(); }
+        function logout() { localStorage.removeItem('ntun_final_v1'); location.reload(); }
     </script>
 </body>
 </html>
