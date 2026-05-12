@@ -3,114 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NTUN Space - HeroUI Edition</title>
+    <title>NTUN Space - iOS 26.5 Edition</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
+        :root {
+            --ios-blur: blur(25px);
+            --ios-border: rgba(255, 255, 255, 0.3);
+            --ios-bg: rgba(255, 255, 255, 0.15);
+        }
+
         body { 
             font-family: 'Kanit', sans-serif; 
-            background: #f2f2f7; 
-            color: #1c1c1e; touch-action: manipulation; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
         }
-        
-        .hero-card { 
-            background: rgba(255, 255, 255, 0.7); 
-            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.8); 
-            border-radius: 2rem;
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+
+        /* --- Meteor Animation Background --- */
+        .stars-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden; pointer-events: none;
         }
+        .meteor {
+            position: absolute; width: 2px; height: 100px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+            opacity: 0; animation: meteor-fall 3s infinite ease-in;
+        }
+        @keyframes meteor-fall {
+            0% { transform: translateY(-100px) translateX(0) rotate(-45deg); opacity: 1; }
+            100% { transform: translateY(100vh) translateX(-500px) rotate(-45deg); opacity: 0; }
+        }
+
+        /* --- Glassmorphism UI --- */
+        .glass {
+            background: var(--ios-bg);
+            backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--ios-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .glass-btn:active { transform: scale(0.95); }
 
         .hero-input {
-            background: rgba(255, 255, 255, 0.9); border: 1.5px solid #e5e5ea;
-            border-radius: 1.5rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px; color: white; transition: all 0.3s;
         }
-        .hero-input:focus { border-color: #007aff; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); outline: none; }
+        .hero-input:focus { background: rgba(255, 255, 255, 0.2); outline: none; border-color: #fff; }
+        .hero-input::placeholder { color: rgba(255,255,255,0.5); }
 
-        .hero-btn { 
-            background: #007aff; color: white; border-radius: 1.5rem; 
-            transition: all 0.2s; font-weight: 700; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
-        }
-        .hero-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0, 122, 255, 0.15); }
-
-        .desk-container {
-            width: 75px; height: 85px; position: absolute; cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .desk-container:active { transform: scale(0.9); }
-        .desk-container.dragging { opacity: 0.8; transform: scale(1.15) rotate(2deg); z-index: 100; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.2)); }
-        
-        .desk-top { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; transition: all 0.3s; }
-        .desk-chair { fill: #94a3b8; transition: all 0.3s; }
-        .desk-groove { fill: rgba(0,0,0,0.05); }
-        
-        .booked .desk-top { fill: #e0f2fe; stroke: #0284c7; }
-        .booked .desk-chair { fill: #0284c7; }
-        
-        .my-seat .desk-top { fill: #dcfce7; stroke: #16a34a; }
-        .my-seat .desk-chair { fill: #16a34a; }
-        
-        .desk-label { 
-            position: absolute; top: 18%; width: 100%; text-align: center; 
-            font-size: 10px; font-weight: 800; color: #334155;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px;
-        }
-
+        /* --- Map Responsive Logic --- */
         .map-wrapper { 
-            width: 100%; overflow: auto; border-radius: 2rem; background: #e5e5ea;
-            background-image: radial-gradient(#d1d5db 1.5px, transparent 1.5px); background-size: 30px 30px;
-            box-shadow: inset 0 4px 20px rgba(0,0,0,0.05); min-height: 65vh; position: relative;
+            width: 100%; border-radius: 24px; background: rgba(0,0,0,0.1);
+            overflow: auto; position: relative; scrollbar-width: none;
         }
-        #roomMap { width: 1100px; height: 900px; position: relative; padding: 40px; }
+        #roomMap { 
+            position: relative; margin: 0 auto;
+            /* ปรับขนาดตามจอ */
+            width: 1000px; height: 800px; 
+            transform-origin: top center;
+        }
 
-        .badge-super { background: #ff3b30; color: white; }
-        .badge-admin { background: #ff9500; color: white; }
-        .badge-teacher { background: #5856d6; color: white; }
-        .badge-student { background: #007aff; color: white; }
+        @media (max-width: 768px) {
+            #roomMap { transform: scale(0.7); width: 700px; height: 600px; }
+            .desk-container { transform: scale(0.8); }
+        }
+        @media (max-width: 480px) {
+            #roomMap { transform: scale(0.45); width: 450px; height: 400px; }
+        }
 
-        /* Custom Scrollbar for Management List */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 10px; }
+        /* --- Desk Styling --- */
+        .desk-container { width: 70px; height: 80px; position: absolute; cursor: pointer; }
+        .desk-top { fill: rgba(255, 255, 255, 0.9); stroke: rgba(0,0,0,0.1); stroke-width: 1; }
+        .desk-chair { fill: rgba(255, 255, 255, 0.4); }
+        .booked .desk-top { fill: #ef4444; }
+        .my-seat .desk-top { fill: #22c55e; }
+        .desk-label { 
+            position: absolute; top: 20%; width: 100%; text-align: center; 
+            font-size: 10px; font-weight: 700; color: #1e293b;
+        }
+
+        /* SweetAlert Glass Theme */
+        .swal2-popup.hero-card {
+            background: rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(30px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 30px !important;
+            color: white !important;
+        }
+        .swal2-title, .swal2-html-container { color: white !important; }
     </style>
 </head>
 <body>
 
-    <div id="loginPage" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-50">
-        <div class="hero-card p-10 w-full max-w-md text-center">
-            <div class="w-24 h-24 bg-blue-600 rounded-[2.5rem] mx-auto mb-8 flex items-center justify-center text-white text-5xl shadow-2xl shadow-blue-500/50">
-                <i class='bx bxs-school'></i>
+    <div class="stars-container" id="meteorContainer"></div>
+
+    <div id="loginPage" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div class="glass p-10 w-full max-w-md text-center">
+            <div class="w-20 h-20 bg-white/20 rounded-[2rem] mx-auto mb-6 flex items-center justify-center text-white text-4xl border border-white/30">
+                <i class='bx bxs-graduation'></i>
             </div>
-            <h1 class="text-3xl font-extrabold mb-1 tracking-tight text-gray-900">NTUN Space</h1>
-            <p class="text-sm font-semibold text-gray-400 mb-10 tracking-widest uppercase">Classroom Manager</p>
+            <h1 class="text-3xl font-bold mb-2">ยินดีต้อนรับกลับมา</h1>
+            <p class="text-white/60 mb-8 font-light">ระบบจองที่นั่ง NTUN Space</p>
             <div id="g_id_onload" data-client_id="738644222886-o9uq6eonuu9hp8srsad1465lh9id41kj.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
-            <div class="g_id_signin flex justify-center mb-6" data-type="standard" data-shape="pill" data-size="large"></div>
-            <p class="text-xs text-gray-400 font-medium"><i class='bx bxs-lock-alt'></i> เข้าสู่ระบบด้วยอีเมลโรงเรียนเท่านั้น</p>
+            <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill" data-size="large" data-theme="filled_blue"></div>
         </div>
     </div>
 
-    <div id="mainApp" class="hidden min-h-screen flex flex-col p-4 md:p-8 max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-8 hero-card px-8 py-5">
+    <div id="mainApp" class="hidden min-h-screen flex flex-col p-4 md:p-8 max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-6 glass px-6 py-4">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                    <i class='bx bxs-user text-2xl text-gray-400'></i>
-                </div>
+                <img id="userImg" src="" class="w-12 h-12 rounded-2xl border-2 border-white/50 object-cover shadow-lg" alt="Profile">
                 <div>
-                    <h2 id="userName" class="text-xl font-bold text-gray-900 leading-none mb-1">User Name</h2>
-                    <span id="userRole" class="text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider">Role</span>
+                    <h2 id="userName" class="text-lg font-bold leading-tight">Name</h2>
+                    <span id="userRole" class="text-[10px] px-2 py-0.5 rounded-full bg-white/20 uppercase tracking-tighter">Role</span>
                 </div>
             </div>
-            <div class="flex gap-3">
-                <button id="manageUserBtn" onclick="showUserManagement()" class="hidden w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm hover:bg-blue-50 transition"><i class='bx bxs-user-plus text-xl'></i></button>
-                <button onclick="logout()" class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-500 shadow-sm hover:bg-red-50 transition"><i class='bx bx-log-out text-xl'></i></button>
+            <div class="flex gap-2">
+                <button id="manageUserBtn" onclick="showUserManagement()" class="hidden w-10 h-10 glass-btn flex items-center justify-center"><i class='bx bxs-user-badge text-xl'></i></button>
+                <button onclick="logout()" class="w-10 h-10 glass-btn flex items-center justify-center text-red-300"><i class='bx bx-power-off text-xl'></i></button>
             </div>
         </header>
 
@@ -118,7 +146,7 @@
     </div>
 
     <script>
-        // --- 1. Firebase Config ---
+        // --- 1. Firebase & Meteor Init ---
         const firebaseConfig = {
             apiKey: "AIzaSyAlaTyhtXf-d6qDSD5AeWR33Hg3VCn55o8",
             authDomain: "ntunspace.firebaseapp.com",
@@ -129,50 +157,62 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
         const SUPER_ADMIN = "ntun21933@ntun.ac.th";
+
+        // สร้างดาวตกแบบสุ่ม
+        function createMeteors() {
+            const container = document.getElementById('meteorContainer');
+            for(let i=0; i<15; i++) {
+                let m = document.createElement('div');
+                m.className = 'meteor';
+                m.style.left = Math.random() * 100 + '%';
+                m.style.animationDelay = Math.random() * 5 + 's';
+                m.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                container.appendChild(m);
+            }
+        }
+        createMeteors();
+
+        // --- 2. Auth & Session ---
         let currentUser = null;
         let activeRoomId = null;
         let classrooms = {};
 
         function parseJwt(token) {
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
+            try {
+                var base64Url = token.split('.')[1];
+                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+            } catch(e) { return null; }
         }
 
         async function handleGoogleLogin(response) {
             const payload = parseJwt(response.credential);
             const email = payload.email.toLowerCase();
-
             if (!email.endsWith('@ntun.ac.th')) {
-                return Swal.fire({icon: 'error', title: 'ผิดพลาด', text: 'กรุณาใช้เมลโรงเรียน @ntun.ac.th', customClass: { popup: 'hero-card' }});
+                return Swal.fire({icon: 'error', title: 'อีเมลไม่ถูกต้อง', text: 'ต้องใช้ @ntun.ac.th เท่านั้น', customClass: { popup: 'hero-card' }});
             }
 
             let role = 'student';
             const userDoc = await db.collection("users").doc(email).get();
-            
             if (email === SUPER_ADMIN) role = 'super_admin';
             else if (userDoc.exists) role = userDoc.data().role;
 
-            currentUser = { email, name: payload.name, role };
-            localStorage.setItem('ntun_session_v5', JSON.stringify(currentUser));
+            currentUser = { email, name: payload.name, role, picture: payload.picture };
+            localStorage.setItem('ntun_session_v6', JSON.stringify(currentUser));
             initApp();
         }
 
-        const saved = localStorage.getItem('ntun_session_v5');
+        const saved = localStorage.getItem('ntun_session_v6');
         if (saved) { currentUser = JSON.parse(saved); initApp(); }
 
         function initApp() {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userName').innerText = currentUser.name;
+            document.getElementById('userImg').src = currentUser.picture || 'https://via.placeholder.com/100';
             const roleEl = document.getElementById('userRole');
             roleEl.innerText = currentUser.role;
-            roleEl.className = `text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider badge-${currentUser.role.replace('_','-')}`;
 
             if (['super_admin', 'admin'].includes(currentUser.role)) {
                 document.getElementById('manageUserBtn').classList.remove('hidden');
@@ -185,25 +225,9 @@
             });
         }
 
-        function logout() { localStorage.removeItem('ntun_session_v5'); location.reload(); }
+        function logout() { localStorage.removeItem('ntun_session_v6'); location.reload(); }
 
-        function calculate332Positions(count) {
-            const seats = [];
-            const blockGap = 90;
-            const colWidth = 95;
-            const rowHeight = 110;
-            for (let i = 0; i < count; i++) {
-                let x;
-                const row = Math.floor(i / 8);
-                const posInRow = i % 8;
-                if (posInRow < 3) x = posInRow * colWidth;
-                else if (posInRow < 6) x = posInRow * colWidth + blockGap;
-                else x = posInRow * colWidth + (blockGap * 2);
-                seats.push({ id: i + 1, x: x + 60, y: row * rowHeight + 120, bookedBy: null, name: null });
-            }
-            return seats;
-        }
-
+        // --- 3. UI Renderers ---
         function renderUI() {
             if (activeRoomId && classrooms[activeRoomId]) renderRoomView();
             else renderDashboard();
@@ -211,48 +235,39 @@
 
         function renderDashboard() {
             const area = document.getElementById('contentArea');
-            const isAdminSide = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-            let html = ``;
-            if (isAdminSide) {
+            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            let html = '';
+
+            if (isAdmin) {
                 html += `
-                <div class="hero-card p-8 mb-10 flex flex-col md:flex-row gap-5 items-end relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 text-blue-500/10 text-9xl"><i class='bx bxs-magic-wand'></i></div>
-                    <div class="flex-1 w-full relative z-10">
-                        <label class="text-xs font-bold text-gray-500 ml-3 uppercase tracking-widest mb-2 block">ชื่อห้องเรียน</label>
-                        <input id="roomName" type="text" placeholder="เช่น ม.3/1" class="hero-input w-full p-4 text-lg font-medium">
+                <div class="glass p-6 mb-8 flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-1 w-full">
+                        <label class="text-[10px] uppercase font-bold ml-2 mb-1 block opacity-60">ชื่อห้องเรียน</label>
+                        <input id="roomName" type="text" placeholder="ม.3/1" class="hero-input w-full p-3">
                     </div>
-                    <div class="w-full md:w-40 relative z-10">
-                        <label class="text-xs font-bold text-gray-500 ml-3 uppercase tracking-widest mb-2 block">จำนวนโต๊ะ</label>
-                        <input id="roomCount" type="number" value="40" class="hero-input w-full p-4 text-center text-lg font-medium">
+                    <div class="w-full md:w-32">
+                        <label class="text-[10px] uppercase font-bold ml-2 mb-1 block opacity-60">ที่นั่ง</label>
+                        <input id="roomCount" type="number" value="40" class="hero-input w-full p-3 text-center">
                     </div>
-                    <button onclick="createRoom()" class="w-full md:w-auto hero-btn px-10 py-4 text-lg relative z-10"><i class='bx bx-plus'></i> สร้างห้อง</button>
+                    <button onclick="createRoom()" class="glass-btn px-8 py-3 w-full md:w-auto font-bold text-sm"><i class='bx bx-plus-circle'></i> สร้าง</button>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">`;
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">`;
                 for (const id in classrooms) {
                     html += `
-                    <div onclick="openRoom('${id}')" class="hero-card p-6 cursor-pointer hover:-translate-y-2 transition-all duration-300 group">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-3xl group-hover:bg-blue-600 group-hover:text-white transition"><i class='bx bxs-door-open'></i></div>
-                            <button onclick="event.stopPropagation(); deleteRoom('${id}')" class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"><i class='bx bx-trash text-xl'></i></button>
-                        </div>
-                        <h3 class="text-2xl font-extrabold text-gray-900">${classrooms[id].name}</h3>
-                        <div class="mt-4 flex items-center gap-3">
-                            <span class="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest">ID: ${id}</span>
-                            <span class="text-gray-400 text-sm font-semibold"><i class='bx bx-chair'></i> ${classrooms[id].seats.length}</span>
-                        </div>
+                    <div onclick="openRoom('${id}')" class="glass p-5 cursor-pointer relative group transition-all hover:bg-white/20">
+                        <button onclick="event.stopPropagation(); deleteRoom('${id}')" class="absolute top-2 right-2 text-white/30 hover:text-red-400"><i class='bx bx-trash'></i></button>
+                        <div class="text-3xl mb-2 opacity-80"><i class='bx bxs-door-open'></i></div>
+                        <h3 class="font-bold text-lg">${classrooms[id].name}</h3>
+                        <p class="text-[10px] opacity-50 uppercase font-bold">ID: ${id}</p>
                     </div>`;
                 }
                 html += `</div>`;
             } else {
                 html += `
-                <div class="max-w-md mx-auto hero-card p-10 text-center mt-10">
-                    <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-[2rem] mx-auto mb-8 flex items-center justify-center text-white text-5xl shadow-lg shadow-blue-500/30">
-                        <i class='bx bxs-key'></i>
-                    </div>
-                    <h3 class="text-3xl font-extrabold mb-2 text-gray-900">เข้าห้องเรียน</h3>
-                    <p class="text-gray-500 mb-8 font-medium text-sm">กรอกรหัส 6 หลักที่ได้รับจากคุณครู</p>
-                    <input id="roomCodeInput" type="text" placeholder="------" maxlength="6" class="hero-input w-full p-5 text-center text-4xl font-black tracking-[12px] uppercase mb-8 text-blue-600 placeholder-gray-300">
-                    <button onclick="joinRoom()" class="w-full hero-btn py-5 text-xl">ยืนยัน</button>
+                <div class="max-w-xs mx-auto glass p-8 text-center mt-10">
+                    <h3 class="text-xl font-bold mb-4 text-white/90">เข้าห้องเรียน</h3>
+                    <input id="roomCodeInput" type="text" placeholder="รหัสห้อง" class="hero-input w-full p-4 text-center text-xl font-bold uppercase mb-4">
+                    <button onclick="joinRoom()" class="glass-btn w-full py-4 text-lg font-bold">เข้าร่วม</button>
                 </div>`;
             }
             area.innerHTML = html;
@@ -261,38 +276,49 @@
         function renderRoomView() {
             const room = classrooms[activeRoomId];
             const area = document.getElementById('contentArea');
-            const isAdminSide = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            
             area.innerHTML = `
                 <div class="flex justify-between items-center mb-6">
-                    <button onclick="activeRoomId=null; renderUI()" class="hero-card px-6 py-3 font-bold text-gray-700 hover:bg-white transition flex items-center gap-2"><i class='bx bx-chevron-left text-xl'></i> ออก</button>
-                    <div class="flex gap-3">
-                        ${isAdminSide ? `<button onclick="resetLayout()" class="bg-gray-800 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg hover:scale-95 transition"><i class='bx bx-grid-alt'></i> จัดโต๊ะ 3:3:2</button>` : ''}
-                        <div class="hero-card px-6 py-3 font-black text-blue-600 text-sm tracking-widest uppercase flex items-center gap-2"><i class='bx bxs-discount'></i> ${activeRoomId}</div>
-                    </div>
+                    <button onclick="activeRoomId=null; renderUI()" class="glass-btn px-4 py-2 text-sm flex items-center gap-2"><i class='bx bx-chevron-left'></i> กลับ</button>
+                    <div class="text-xs glass-btn px-4 py-2 font-bold opacity-80">ROOM: ${activeRoomId}</div>
                 </div>
-                <div class="map-wrapper">
-                    <div class="sticky top-0 left-0 w-full pt-8 pb-4 bg-gradient-to-b from-[#e5e5ea] to-transparent z-10 flex flex-col items-center pointer-events-none">
-                        <div class="w-80 h-10 bg-white border border-gray-200 rounded-xl shadow-sm flex items-center justify-center text-xs font-black tracking-[10px] text-gray-400 uppercase">Whiteboard</div>
+                <div class="map-wrapper glass p-4">
+                    <div class="w-full flex justify-center mb-10 pointer-events-none">
+                        <div class="w-1/2 h-8 glass flex items-center justify-center text-[10px] font-bold tracking-[10px] opacity-40">WHITEBOARD</div>
                     </div>
                     <div id="roomMap">
                         ${room.seats.map(s => {
-                            let state = 'available', displayLabel = s.id;
+                            let state = '', display = s.id;
                             if (s.bookedBy) {
-                                if (s.bookedBy === currentUser.email) { state = 'my-seat'; displayLabel = "YOU"; }
-                                else { state = 'booked'; displayLabel = isAdminSide ? s.name.split(' ')[0] : 'จองแล้ว'; }
+                                if (s.bookedBy === currentUser.email) { state = 'my-seat'; display = "YOU"; }
+                                else { state = 'booked'; display = isAdmin ? s.name.split(' ')[0] : 'จองแล้ว'; }
                             }
                             return `
                             <div id="desk-${s.id}" class="desk-container ${state}" style="left:${s.x}px; top:${s.y}px;" onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
-                                <svg viewBox="0 0 100 110" width="100%" height="100%" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));">
-                                    <rect x="25" y="80" width="50" height="25" rx="10" class="desk-chair" />
-                                    <rect x="5" y="10" width="90" height="60" rx="8" class="desk-top" />
-                                    <rect x="15" y="20" width="70" height="3" rx="1.5" class="desk-groove" />
+                                <svg viewBox="0 0 100 110">
+                                    <rect x="25" y="80" width="50" height="25" rx="8" class="desk-chair" />
+                                    <rect x="5" y="10" width="90" height="60" rx="12" class="desk-top" />
                                 </svg>
-                                <div class="desk-label">${displayLabel}</div>
+                                <div class="desk-label">${display}</div>
                             </div>`;
                         }).join('')}
                     </div>
                 </div>`;
+        }
+
+        // --- 4. Logic & Interactions ---
+        function calculatePositions(count) {
+            const seats = [];
+            const colWidth = 100, rowHeight = 110;
+            for (let i = 0; i < count; i++) {
+                const row = Math.floor(i / 8), col = i % 8;
+                let x = col * colWidth;
+                if (col >= 3) x += 60; // ทางเดิน 1
+                if (col >= 6) x += 60; // ทางเดิน 2
+                seats.push({ id: i + 1, x: x + 40, y: row * rowHeight + 100, bookedBy: null, name: null });
+            }
+            return seats;
         }
 
         async function createRoom() {
@@ -300,32 +326,23 @@
             const count = parseInt(document.getElementById('roomCount').value);
             if (!name || !count) return;
             const id = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const seats = calculate332Positions(count);
-            await db.collection("classrooms").doc(id).set({ name, seats });
-            Swal.fire({icon: 'success', title: 'สร้างห้องสำเร็จ', text: `รหัสห้อง: ${id}`, customClass: {popup: 'hero-card'}});
-        }
-
-        async function resetLayout() {
-            const room = classrooms[activeRoomId];
-            const newSeats = calculate332Positions(room.seats.length);
-            room.seats.forEach((oldSeat, idx) => { if(newSeats[idx]) { newSeats[idx].bookedBy = oldSeat.bookedBy; newSeats[idx].name = oldSeat.name; } });
-            await db.collection("classrooms").doc(activeRoomId).update({ seats: newSeats });
-        }
-
-        function joinRoom() {
-            const code = document.getElementById('roomCodeInput').value.toUpperCase();
-            if (classrooms[code]) { activeRoomId = code; renderUI(); }
-            else Swal.fire({icon: 'error', title: 'ไม่พบห้อง', text: 'กรุณาตรวจสอบรหัสอีกครั้ง', customClass: {popup: 'hero-card'}});
+            await db.collection("classrooms").doc(id).set({ name, seats: calculatePositions(count) });
         }
 
         function openRoom(id) { activeRoomId = id; renderUI(); }
-        
+        function joinRoom() {
+            const code = document.getElementById('roomCodeInput').value.toUpperCase();
+            if (classrooms[code]) { activeRoomId = code; renderUI(); }
+            else Swal.fire({icon:'error', title:'ไม่พบห้อง', customClass:{popup:'hero-card'}});
+        }
+
         function deleteRoom(id) {
-            Swal.fire({title: 'ลบห้องเรียน?', text:'กู้คืนไม่ได้นะครับ', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ff3b30', customClass: {popup: 'hero-card'}}).then(res => {
-                if(res.isConfirmed) db.collection("classrooms").doc(id).delete();
+            Swal.fire({title:'ลบห้องเรียน?', icon:'warning', showCancelButton:true, customClass:{popup:'hero-card'}}).then(r => {
+                if(r.isConfirmed) db.collection("classrooms").doc(id).delete();
             });
         }
 
+        // --- Drag & Interaction ---
         let dragId = null, isMoving = false, startX, startY, initX, initY;
         function startDrag(e, id) {
             const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
@@ -334,15 +351,15 @@
             startX = ev.clientX; startY = ev.clientY;
             const el = document.getElementById('desk-'+id);
             initX = parseInt(el.style.left); initY = parseInt(el.style.top);
-            if(isAdmin) el.classList.add('dragging');
+            if(isAdmin) el.style.zIndex = 1000;
         }
 
-        document.addEventListener('mousemove', handleMove);
-        document.addEventListener('touchmove', handleMove, {passive: false});
+        document.addEventListener('mousemove', e => handleMove(e));
+        document.addEventListener('touchmove', e => handleMove(e), {passive: false});
         function handleMove(e) {
-            if(!dragId || !['super_admin', 'admin', 'teacher'].includes(currentUser.role)) return;
+            if(!dragId || !['super_admin','admin','teacher'].includes(currentUser.role)) return;
             const ev = e.touches ? e.touches[0] : e;
-            const dx = ev.clientX - startX; const dy = ev.clientY - startY;
+            const dx = ev.clientX - startX, dy = ev.clientY - startY;
             if(Math.abs(dx) > 5 || Math.abs(dy) > 5) isMoving = true;
             if(isMoving) {
                 const el = document.getElementById('desk-'+dragId);
@@ -354,113 +371,72 @@
         document.addEventListener('touchend', endDrag);
         function endDrag() {
             if(!dragId) return;
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
             if(isMoving && isAdmin) {
                 const el = document.getElementById('desk-'+dragId);
                 const room = classrooms[activeRoomId];
                 const seat = room.seats.find(s => s.id === dragId);
                 seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top);
                 db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
-            } else if(!isMoving) { handleBooking(dragId); }
-            if(isAdmin) document.getElementById('desk-'+dragId).classList.remove('dragging');
+            } else if(!isMoving) handleBooking(dragId);
             dragId = null;
         }
 
         async function handleBooking(sid) {
             const room = classrooms[activeRoomId];
             const seat = room.seats.find(s => s.id === sid);
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
             if (seat.bookedBy) {
                 if (seat.bookedBy === currentUser.email || isAdmin) {
-                    Swal.fire({ title: 'ยกเลิกที่นั่ง?', icon: 'question', showCancelButton: true, customClass: {popup: 'hero-card'} })
-                    .then(res => { if(res.isConfirmed) { seat.bookedBy = null; seat.name = null; saveRoom(); }});
+                    Swal.fire({ title: 'ยกเลิกการจอง?', icon: 'question', showCancelButton: true, customClass: {popup: 'hero-card'} })
+                    .then(r => { if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; saveRoom(); }});
                 }
             } else {
-                if (!isAdmin && room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire({icon: 'warning', title: 'จองซ้ำ', text: 'คุณจองไปแล้ว 1 ที่ครับ', customClass: {popup: 'hero-card'}});
+                if (!isAdmin && room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire({icon: 'warning', title: 'คุณจองไปแล้ว'});
                 seat.bookedBy = currentUser.email; seat.name = currentUser.name;
                 saveRoom();
             }
         }
         function saveRoom() { db.collection("classrooms").doc(activeRoomId).update({ seats: classrooms[activeRoomId].seats }); }
 
-        // --- 7. Management ระบบแก้ไขใหม่ (ดึงรายชื่อและลบได้) ---
+        // --- 5. User Management (เวอร์ชันสมบูรณ์) ---
         async function showUserManagement() {
-            const snapshot = await db.collection("users").get();
-            let userRows = '';
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const email = doc.id;
-                if (email !== SUPER_ADMIN) {
-                    userRows += `
-                        <div class="flex justify-between items-center p-3 mb-2 bg-gray-50 rounded-2xl border border-gray-100">
-                            <div class="text-left">
-                                <div class="text-sm font-bold text-gray-900">${email}</div>
-                                <div class="text-[10px] font-black uppercase tracking-widest text-blue-500">${data.role}</div>
-                            </div>
-                            <button onclick="removeUserRole('${email}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition">
-                                <i class='bx bx-x text-xl'></i>
-                            </button>
-                        </div>`;
+            const snap = await db.collection("users").get();
+            let rows = '';
+            snap.forEach(doc => {
+                if (doc.id !== SUPER_ADMIN) {
+                    rows += `
+                    <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl mb-2">
+                        <div class="text-left"><p class="text-xs font-bold">${doc.id}</p><p class="text-[8px] opacity-50 uppercase">${doc.data().role}</p></div>
+                        <button onclick="removeUser('${doc.id}')" class="text-red-400 px-2"><i class='bx bx-x-circle'></i></button>
+                    </div>`;
                 }
             });
-
             Swal.fire({
-                title: 'จัดการสิทธิ์ผู้ใช้งาน',
+                title: 'จัดการผู้ดูแล',
                 html: `
-                    <div class="mb-6">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-left">เพิ่มคนใหม่</p>
-                        <input id="swalEmail" placeholder="อีเมล @ntun.ac.th" class="hero-input w-full p-4 mb-3">
-                        <select id="swalRole" class="hero-input w-full p-4 mb-4">
-                            ${currentUser.role === 'super_admin' ? '<option value="admin">Admin (ผู้ดูแลระบบ)</option>' : ''}
-                            <option value="teacher">Teacher (คุณครู)</option>
-                        </select>
-                        <button id="addBtn" class="hero-btn w-full py-3 text-sm">เพิ่มตำแหน่ง</button>
-                    </div>
-                    <hr class="mb-6 border-gray-100">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-left">รายชื่อผู้ดูแลปัจจุบัน</p>
-                    <div class="max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-                        ${userRows || '<p class="text-gray-400 text-sm py-4 text-center">ไม่มีผู้ดูแลคนอื่น</p>'}
-                    </div>`,
-                showConfirmButton: false,
-                showCancelButton: true,
-                cancelButtonText: 'ปิดหน้าต่าง',
-                customClass: { popup: 'hero-card', cancelButton: 'bg-gray-200 text-gray-700 px-8 py-3 rounded-2xl font-bold mt-2' },
-                buttonsStyling: false,
+                    <input id="swalEmail" placeholder="email @ntun.ac.th" class="hero-input w-full p-3 mb-2 text-sm">
+                    <select id="swalRole" class="hero-input w-full p-3 mb-4 text-sm bg-indigo-900">
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button id="addBtn" class="glass-btn w-full py-2 mb-4 text-sm font-bold">เพิ่มสมาชิก</button>
+                    <div class="max-h-40 overflow-y-auto">${rows || '<p class="opacity-30">ไม่มีข้อมูล</p>'}</div>
+                `,
+                showConfirmButton: false, showCancelButton: true, customClass:{popup:'hero-card'},
                 didOpen: () => {
                     document.getElementById('addBtn').onclick = async () => {
                         const email = document.getElementById('swalEmail').value.trim().toLowerCase();
-                        const role = document.getElementById('swalRole').value;
-                        if(!email.endsWith('@ntun.ac.th')) return Swal.showValidationMessage('เฉพาะอีเมล @ntun.ac.th เท่านั้น');
-                        await db.collection("users").doc(email).set({ role, name: "Pending User" });
-                        Swal.close();
-                        Swal.fire({ icon: 'success', title: 'เพิ่มสำเร็จ', customClass: {popup: 'hero-card'}, timer: 1500 });
-                        setTimeout(showUserManagement, 1600);
+                        if(!email.endsWith('@ntun.ac.th')) return;
+                        await db.collection("users").doc(email).set({ role: document.getElementById('swalRole').value, name: "New Member" });
+                        Swal.close(); showUserManagement();
                     };
                 }
             });
         }
-
-        async function removeUserRole(email) {
-            const result = await Swal.fire({
-                title: 'ยืนยันการลบยศ?',
-                text: `คุณต้องการถอนสิทธิ์ของ ${email} ใช่หรือไม่?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'ใช่, ลบออก',
-                cancelButtonText: 'ยกเลิก',
-                customClass: { 
-                    popup: 'hero-card',
-                    confirmButton: 'bg-red-500 text-white px-6 py-3 rounded-2xl font-bold',
-                    cancelButton: 'bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-bold ml-2' 
-                },
-                buttonsStyling: false
-            });
-            if (result.isConfirmed) {
-                await db.collection("users").doc(email).delete();
-                Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', customClass: {popup: 'hero-card'}, timer: 1500 });
-                setTimeout(showUserManagement, 1600);
-            }
+        async function removeUser(email) {
+            await db.collection("users").doc(email).delete();
+            Swal.close(); showUserManagement();
         }
     </script>
 </body>
