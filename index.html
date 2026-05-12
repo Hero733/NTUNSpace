@@ -22,18 +22,16 @@
 
         body { 
             font-family: 'Kanit', sans-serif; 
-            /* ไล่สีแนวตั้ง (Vertical Gradient) ตามแบบที่ต้องการ */
             background: linear-gradient(180deg, #87CEEB 0%, #7B68EE 50%, #FF69B4 100%);
             background-attachment: fixed;
             min-height: 100vh; color: white; overflow-x: hidden; margin: 0;
         }
 
-        /* เมฆและกิมมิคหลังฉาก */
         .cloud-footer {
             position: fixed;
             bottom: -40px; left: 0; width: 100%; height: 180px;
             background: url('https://www.transparenttextures.com/patterns/clouds.png');
-            filter: brightness(0) invert(1) opacity(0.6);
+            filter: brightness(0) invert(1) opacity(0.5);
             z-index: 1; pointer-events: none;
         }
 
@@ -41,7 +39,7 @@
             background: var(--glass-bg); 
             backdrop-filter: blur(25px) saturate(180%); 
             border: 1px solid var(--glass-border);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
 
         .glass-pill { 
@@ -51,11 +49,11 @@
             border-radius: 999px;
         }
 
-        /* Progress Bar ในแต่ละคลาส */
+        /* Progress Bar */
         .progress-container { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.25); border-radius: 999px; margin-top: 15px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #22c55e; transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px rgba(34, 197, 94, 0.6); }
+        .progress-fill { height: 100%; background: #22c55e; transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
 
-        /* ดีไซน์เก้าอี้และโต๊ะ */
+        /* Desk & Chair Design */
         .desk { width: 68px; height: 82px; position: absolute; transition: all 0.3s; cursor: pointer; }
         .desk:hover { transform: translateY(-5px); z-index: 50; }
         .desk-part { fill: rgba(255, 255, 255, 0.75); stroke: white; stroke-width: 1.5; rx: 8; }
@@ -68,9 +66,9 @@
         .animate-in { animation: fadeIn 0.6s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Responsive Scaling */
+        /* Responsive Optimization */
         @media (max-width: 768px) {
-            .map-outer { overflow-x: auto; padding-bottom: 20px; }
+            .map-outer { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
             .map-inner { transform: scale(0.9); transform-origin: top left; }
             h1 { font-size: 2.8rem !important; }
         }
@@ -81,7 +79,7 @@
     <div class="cloud-footer"></div>
 
     <div id="loginPage" class="fixed inset-0 z-[200] flex items-center justify-center p-6">
-        <div class="glass p-12 w-full max-w-sm text-center rounded-[3.5rem] animate-in">
+        <div class="glass p-10 w-full max-w-sm text-center rounded-[3.5rem] animate-in">
             <div class="w-28 h-28 mx-auto mb-8 bg-white rounded-full p-4 shadow-xl">
                 <img src="photo/logo.png" alt="Logo" class="w-full h-full object-contain">
             </div>
@@ -90,7 +88,10 @@
                 <h1 class="text-4xl font-bold mt-4 drop-shadow-md">ระบบลงทะเบียน</h1>
                 <p class="text-white/90 mt-2 text-sm font-light">นวมินทราชินูทิศ เตรียมอุดมศึกษาน้อมเกล้า</p>
             </div>
-            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID" data-callback="handleGoogleLogin"></div>
+            <div id="g_id_onload" 
+                 data-client_id="118310489688-ksc64dv5rnv7o9jo2oklfeeibc2qk452.apps.googleusercontent.com" 
+                 data-callback="handleGoogleLogin">
+            </div>
             <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill" data-size="large"></div>
             <p class="mt-10 text-[10px] font-bold opacity-60 tracking-widest uppercase">@ntun.ac.th only</p>
         </div>
@@ -105,7 +106,7 @@
                 <h2 class="text-2xl font-bold tracking-tight uppercase drop-shadow-md">NTUN SPACE</h2>
             </div>
             <div class="flex items-center gap-3">
-                <div class="glass-pill px-4 py-2 flex items-center gap-4">
+                <div class="glass-pill px-4 py-2 flex items-center gap-3">
                     <img id="userImg" class="w-9 h-9 rounded-full border-2 border-white/50">
                     <span id="userName" class="text-sm font-bold truncate max-w-[150px]"></span>
                 </div>
@@ -115,8 +116,8 @@
 
         <main class="max-w-7xl mx-auto px-6 pb-24">
             <section id="studentAction" class="mt-10 animate-in">
-                <p class="text-lg opacity-90 font-medium mb-1">ยินดีต้อนรับ,</p>
-                <h1 class="text-5xl md:text-6xl font-bold mb-12 drop-shadow-lg">สวัสดี, <span id="welcomeName"></span></h1>
+                <p class="text-lg opacity-90 font-medium mb-1">Welcome back,</p>
+                <h1 class="text-5xl md:text-6xl font-bold mb-10 drop-shadow-lg">สวัสดี, <span id="welcomeName"></span></h1>
                 
                 <div id="statusContainer"></div>
 
@@ -155,7 +156,7 @@
         const SUPER_ADMIN = "ntun21933@ntun.ac.th";
         let currentUser = null, activeRoomId = null, classrooms = {};
 
-        // Fix: ดึง Username จากอีเมลเพื่อแก้ปัญหาชื่ออ่านไม่ออก
+        // ฟังก์ชันดึง Username จากอีเมลเพื่อแก้ปัญหาชื่อแปลกๆ
         function getUsername(email) {
             return email.split('@')[0];
         }
@@ -251,8 +252,8 @@
                 </div>
                 <div class="map-outer glass rounded-[4rem] p-6 md:p-12 border-white/30 overflow-auto">
                     <div class="map-inner w-[950px] h-[750px] mx-auto relative">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[450px] h-3 bg-white/30 rounded-full"></div>
-                        <p class="absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-black opacity-40 uppercase tracking-[0.5em]">FRONT SIDE</p>
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[450px] h-3 bg-white/40 rounded-full"></div>
+                        <p class="absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-black opacity-40 uppercase tracking-[0.5em]">FRONT OF CLASS</p>
                         ${room.seats.map(s => {
                             const isMe = s.bookedBy === currentUser.email;
                             const state = isMe ? 'my-seat' : (s.bookedBy ? 'booked' : '');
@@ -272,7 +273,7 @@
         async function joinByCode() {
             const code = document.getElementById('joinCode').value.trim().toUpperCase();
             if (classrooms[code]) enterRoom(code);
-            else Swal.fire('ไม่พบรหัสห้อง!', 'โปรดตรวจสอบอีกครั้ง', 'warning');
+            else Swal.fire('ไม่พบรหัสห้อง!', 'โปรดตรวจสอบรหัสอีกครั้ง', 'warning');
         }
 
         function enterRoom(id) { activeRoomId = id; renderUI(); }
