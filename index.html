@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NTUN Space - Pro Edition</title>
+    <title>NTUN Space - HeroUI Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,102 +16,92 @@
     <style>
         body { 
             font-family: 'Kanit', sans-serif; 
-            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
-            min-height: 100vh;
-            color: #ffffff;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            min-height: 100vh; color: white; touch-action: manipulation;
         }
         
-        /* Glassmorphism Effect */
         .glass-card { 
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15); 
             border-radius: 2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        .glass-pill {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 9999px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .hero-input {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.2rem; color: white; transition: 0.3s;
         }
+        .hero-input:focus { border-color: #3b82f6; background: rgba(255, 255, 255, 0.1); outline: none; }
 
-        .hero-btn-primary {
-            background: #22c55e; /* สีเขียวแบบในรูป */
-            color: white;
-            border-radius: 9999px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
+        .btn-pill {
+            border-radius: 9999px; transition: all 0.2s; font-weight: 600;
+            display: flex; items-center; justify-content: center; gap: 8px;
         }
-        .hero-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3); }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:active { transform: scale(0.95); }
 
-        /* Desk Styling */
+        /* Desk Logic */
         .desk-container {
-            width: 70px; height: 80px; position: absolute; cursor: grab;
-            transition: transform 0.1s;
+            width: 70px; height: 80px; position: absolute; cursor: pointer;
+            transition: transform 0.2s;
         }
-        .desk-container:active { cursor: grabbing; }
-        .desk-container.dragging { z-index: 100; transform: scale(1.1); filter: drop-shadow(0 20px 20px rgba(0,0,0,0.4)); }
+        .desk-container.dragging { z-index: 100; transform: scale(1.1); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
         
-        .desk-top { fill: rgba(255,255,255,0.9); stroke: #cbd5e1; stroke-width: 2; }
-        .desk-chair { fill: #94a3b8; }
-        
-        .booked .desk-top { fill: #dbeafe; stroke: #3b82f6; }
-        .booked .desk-chair { fill: #3b82f6; }
-        
-        .my-seat .desk-top { fill: #dcfce7; stroke: #22c55e; }
-        .my-seat .desk-chair { fill: #22c55e; }
+        .desk-top { fill: rgba(255, 255, 255, 0.9); stroke: #94a3b8; stroke-width: 2; }
+        .booked .desk-top { fill: #3b82f6; stroke: #2563eb; }
+        .my-seat .desk-top { fill: #22c55e; stroke: #16a34a; }
+        .desk-label { position: absolute; top: 25px; width: 100%; text-align: center; color: #1e293b; font-size: 10px; font-weight: 800; pointer-events: none; }
+        .booked .desk-label, .my-seat .desk-label { color: white; }
 
-        #roomMap { 
-            width: 1000px; height: 800px; position: relative; 
-            background: rgba(0,0,0,0.1); border-radius: 2rem;
+        .map-wrapper { 
+            width: 100%; overflow: auto; background: rgba(0,0,0,0.2); border-radius: 2rem;
+            min-height: 60vh; position: relative; border: 1px solid rgba(255,255,255,0.1);
         }
+        #roomMap { width: 1000px; height: 850px; position: relative; }
 
-        .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+        /* Badge Colors */
+        .badge-super_admin { background: #ef4444; }
+        .badge-admin { background: #f97316; }
+        .badge-teacher { background: #8b5cf6; }
+        .badge-student { background: #3b82f6; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div id="loginPage" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
-        <div class="glass-card p-10 w-full max-w-md text-center border-white/30">
-            <div class="w-20 h-20 bg-white/20 rounded-3xl mx-auto mb-6 flex items-center justify-center text-white text-4xl shadow-xl">
-                <i class='bx bxs-layout'></i>
+    <div id="loginPage" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#0f172a]">
+        <div class="glass-card p-10 w-full max-w-md text-center">
+            <div class="w-20 h-20 bg-blue-600 rounded-[2rem] mx-auto mb-6 flex items-center justify-center text-white text-4xl shadow-2xl shadow-blue-500/40">
+                <i class='bx bxs-school'></i>
             </div>
             <h1 class="text-3xl font-bold mb-2">NTUN Space</h1>
-            <p class="text-white/60 mb-8 font-light">ระบบจัดการห้องเรียนยุคใหม่</p>
+            <p class="text-white/50 mb-10 text-sm font-light">เข้าสู่ระบบด้วยอีเมล @ntun.ac.th</p>
             <div id="g_id_onload" data-client_id="738644222886-o9uq6eonuu9hp8srsad1465lh9id41kj.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
-            <div class="g_id_signin flex justify-center mb-6" data-type="standard" data-shape="pill" data-size="large" data-theme="filled_blue"></div>
+            <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill" data-size="large"></div>
         </div>
     </div>
 
-    <div id="mainApp" class="hidden max-w-6xl mx-auto">
-        <header class="glass-pill px-6 py-3 flex justify-between items-center mb-12">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
-                    <img id="userImg" src="" alt="" class="hidden w-full h-full object-cover">
-                    <i id="userIcon" class='bx bxs-user text-xl'></i>
+    <div id="mainApp" class="hidden">
+        <header class="glass-card px-6 py-4 flex justify-between items-center mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
+                    <img id="userImg" src="" class="w-full h-full object-cover">
                 </div>
-                <div class="hidden sm:block">
-                    <p class="text-[10px] text-white/50 leading-none">ยินดีต้อนรับกลับมา</p>
-                    <h2 id="userName" class="text-sm font-bold">User Name</h2>
+                <div>
+                    <h2 id="userName" class="font-bold text-sm leading-none mb-1">User Name</h2>
+                    <span id="userRole" class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter">Role</span>
                 </div>
             </div>
-
-            <nav class="flex gap-2">
-                <button onclick="renderDashboard()" class="px-4 py-2 hover:bg-white/10 rounded-full text-sm transition">แดชบอร์ด</button>
-                <button id="adminBtn" onclick="showUserManagement()" class="hidden px-4 py-2 hover:bg-white/10 rounded-full text-sm transition">จัดการสิทธิ์</button>
-                <button onclick="logout()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/40 rounded-full text-sm text-red-300 transition">ออกจากระบบ</button>
-            </nav>
+            <div class="flex gap-2">
+                <button id="manageBtn" onclick="showUserManagement()" class="hidden w-10 h-10 glass-card flex items-center justify-center hover:bg-white/10 transition"><i class='bx bxs-user-plus'></i></button>
+                <button onclick="logout()" class="w-10 h-10 glass-card flex items-center justify-center text-red-400 hover:bg-red-500/10 transition"><i class='bx bx-log-out'></i></button>
+            </div>
         </header>
 
         <div id="contentArea"></div>
     </div>
 
     <script>
-        // Config & State
+        // --- 1. Firebase & Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyAlaTyhtXf-d6qDSD5AeWR33Hg3VCn55o8",
             authDomain: "ntunspace.firebaseapp.com",
@@ -123,46 +113,49 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const SUPER_ADMIN = "ntun21933@ntun.ac.th";
+        const SUPER_ADMIN_EMAIL = "ntun21933@ntun.ac.th";
         let currentUser = null;
         let activeRoomId = null;
         let classrooms = {};
 
-        // Login Functions
-        function parseJwt(token) {
-            let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-        }
-
+        // --- 2. Authentication ---
         async function handleGoogleLogin(response) {
-            const payload = parseJwt(response.credential);
+            const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
             const email = payload.email.toLowerCase();
-            if (!email.endsWith('@ntun.ac.th')) return Swal.fire({icon: 'error', title: 'ไม่อนุญาต', text: 'ต้องใช้เมลโรงเรียนเท่านั้น'});
+
+            if (!email.endsWith('@ntun.ac.th')) {
+                return Swal.fire({icon: 'error', title: 'ผิดพลาด', text: 'เฉพาะอีเมล @ntun.ac.th เท่านั้น'});
+            }
 
             let role = 'student';
-            const userDoc = await db.collection("users").doc(email).get();
-            if (email === SUPER_ADMIN) role = 'super_admin';
-            else if (userDoc.exists) role = userDoc.data().role;
+            if (email === SUPER_ADMIN_EMAIL) {
+                role = 'super_admin';
+            } else {
+                const userDoc = await db.collection("users").doc(email).get();
+                if (userDoc.exists) role = userDoc.data().role;
+            }
 
             currentUser = { email, name: payload.name, role, picture: payload.picture };
-            localStorage.setItem('ntun_session_v6', JSON.stringify(currentUser));
+            localStorage.setItem('ntun_session_v7', JSON.stringify(currentUser));
             initApp();
         }
 
         function initApp() {
-            const saved = localStorage.getItem('ntun_session_v6');
+            const saved = localStorage.getItem('ntun_session_v7');
             if (saved) currentUser = JSON.parse(saved);
             if (!currentUser) return;
 
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userName').innerText = currentUser.name;
-            if (currentUser.picture) {
-                const img = document.getElementById('userImg');
-                img.src = currentUser.picture; img.classList.remove('hidden');
-                document.getElementById('userIcon').classList.add('hidden');
+            document.getElementById('userImg').src = currentUser.picture;
+            const roleBadge = document.getElementById('userRole');
+            roleBadge.innerText = currentUser.role;
+            roleBadge.className = `text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter badge-${currentUser.role}`;
+
+            if (['super_admin', 'admin'].includes(currentUser.role)) {
+                document.getElementById('manageBtn').classList.remove('hidden');
             }
-            if (['super_admin', 'admin'].includes(currentUser.role)) document.getElementById('adminBtn').classList.remove('hidden');
 
             db.collection("classrooms").onSnapshot(snap => {
                 snap.forEach(doc => { classrooms[doc.id] = doc.data(); });
@@ -170,25 +163,9 @@
             });
         }
 
-        function logout() { localStorage.removeItem('ntun_session_v6'); location.reload(); }
+        function logout() { localStorage.removeItem('ntun_session_v7'); location.reload(); }
 
-        // Layout Calculator (3:3:2)
-        function calculate332Positions(count) {
-            const seats = [];
-            const blockGap = 100, colWidth = 90, rowHeight = 110;
-            for (let i = 0; i < count; i++) {
-                let x;
-                const row = Math.floor(i / 8);
-                const posInRow = i % 8;
-                if (posInRow < 3) x = posInRow * colWidth;
-                else if (posInRow < 6) x = posInRow * colWidth + blockGap;
-                else x = posInRow * colWidth + (blockGap * 2);
-                seats.push({ id: i + 1, x: x + 100, y: row * rowHeight + 150, bookedBy: null, name: null });
-            }
-            return seats;
-        }
-
-        // UI Rendering
+        // --- 3. UI Logic ---
         function renderUI() {
             if (activeRoomId) renderRoomView();
             else renderDashboard();
@@ -196,85 +173,90 @@
 
         function renderDashboard() {
             const area = document.getElementById('contentArea');
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-            let html = `<h1 class="text-4xl font-bold mb-8">สวัสดี, <span class="text-blue-300">${currentUser.name.split(' ')[0]}</span></h1>`;
-            
-            if (isAdmin) {
+            const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            let html = `<h1 class="text-3xl font-bold mb-6">สวัสดี, <span class="text-blue-400">${currentUser.name.split(' ')[0]}</span></h1>`;
+
+            if (isStaff) {
                 html += `
-                <div class="glass-card p-8 mb-8 flex flex-col md:flex-row gap-4 items-end">
-                    <div class="flex-1 w-full"><label class="text-xs text-white/50 ml-2">ชื่อห้องเรียน</label><input id="roomName" class="w-full bg-white/10 border-white/20 border p-3 rounded-2xl focus:outline-none" placeholder="ม.3/1"></div>
-                    <div class="w-full md:w-32"><label class="text-xs text-white/50 ml-2">โต๊ะ</label><input id="roomCount" type="number" value="40" class="w-full bg-white/10 border-white/20 border p-3 rounded-2xl text-center"></div>
-                    <button onclick="createRoom()" class="hero-btn-primary px-8 py-3 w-full md:w-auto">สร้างห้อง</button>
+                <div class="glass-card p-6 mb-8 flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-1 w-full"><label class="text-[10px] ml-2 opacity-50 uppercase font-bold">ชื่อห้องเรียน (ม.3/1)</label><input id="roomName" class="hero-input w-full p-3 mt-1" placeholder="ระบุชื่อห้อง"></div>
+                    <div class="w-full md:w-32"><label class="text-[10px] ml-2 opacity-50 uppercase font-bold">จำนวนโต๊ะ</label><input id="roomCount" type="number" value="40" class="hero-input w-full p-3 mt-1 text-center"></div>
+                    <button onclick="createRoom()" class="btn-pill btn-primary px-8 py-3 w-full md:w-auto"><i class='bx bx-plus'></i> สร้างห้อง</button>
+                </div>`;
+            } else {
+                html += `
+                <div class="glass-card p-8 text-center mb-8 max-w-md mx-auto">
+                    <h3 class="text-xl font-bold mb-4">เข้าสู่ห้องเรียน</h3>
+                    <input id="joinCode" class="hero-input w-full p-4 text-center text-2xl font-black tracking-[10px] mb-4" placeholder="CODE">
+                    <button onclick="joinRoom()" class="btn-pill btn-primary w-full py-4">ตกลง</button>
                 </div>`;
             }
 
-            html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
             for (const id in classrooms) {
-                const room = classrooms[id];
-                const booked = room.seats.filter(s => s.bookedBy).length;
-                const percent = (booked / room.seats.length) * 100;
+                if (!isStaff && activeRoomId !== id) continue; // นักเรียนจะเห็นเฉพาะห้องที่จองหรือมีรหัส
                 html += `
-                <div onclick="activeRoomId='${id}'; renderUI()" class="glass-card p-6 cursor-pointer hover:bg-white/20 transition-all group">
+                <div onclick="activeRoomId='${id}'; renderUI()" class="glass-card p-5 cursor-pointer hover:bg-white/10 transition group">
                     <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-2xl"><i class='bx bx-door-open'></i></div>
-                        ${isAdmin ? `<button onclick="event.stopPropagation(); deleteRoom('${id}')" class="text-white/30 hover:text-red-400"><i class='bx bx-trash'></i></button>` : ''}
+                        <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-xl"><i class='bx bx-door-open'></i></div>
+                        ${isStaff ? `<button onclick="event.stopPropagation(); deleteRoom('${id}')" class="text-white/20 hover:text-red-500"><i class='bx bx-trash'></i></button>` : ''}
                     </div>
-                    <h3 class="text-xl font-bold mb-1">${room.name}</h3>
-                    <p class="text-xs text-white/40 mb-4">ID: ${id}</p>
-                    <div class="flex justify-between text-[10px] mb-1"><span>ความจุ</span><span>${booked}/${room.seats.length}</span></div>
-                    <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                        <div class="h-full bg-green-400" style="width: ${percent}%"></div>
-                    </div>
+                    <h3 class="text-lg font-bold">${classrooms[id].name}</h3>
+                    <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest">รหัสห้อง: ${id}</p>
                 </div>`;
             }
             html += `</div>`;
-            if (!isAdmin && Object.keys(classrooms).length === 0) {
-                html = `<div class="glass-card p-20 text-center"><h2 class="text-2xl opacity-50">ไม่มีห้องเรียนในระบบ</h2></div>`;
-            }
             area.innerHTML = html;
         }
 
         function renderRoomView() {
             const room = classrooms[activeRoomId];
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
             document.getElementById('contentArea').innerHTML = `
-                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
-                    <button onclick="activeRoomId=null; renderUI()" class="glass-pill px-6 py-2 flex items-center gap-2 hover:bg-white/10 transition"><i class='bx bx-arrow-back'></i> กลับ</button>
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="activeRoomId=null; renderUI()" class="btn-pill glass-card px-5 py-2 text-sm"><i class='bx bx-chevron-left'></i> ออก</button>
                     <div class="flex gap-2">
-                        ${isAdmin ? `<button onclick="resetTo332()" class="bg-blue-500 px-6 py-2 rounded-full text-xs font-bold shadow-lg shadow-blue-500/30">จัดโต๊ะแบบ 3:3:2</button>` : ''}
-                        <div class="glass-pill px-6 py-2 text-xs font-bold border-green-500/50 text-green-400">${activeRoomId}</div>
+                        ${isStaff ? `<button onclick="resetLayout()" class="btn-pill bg-white/10 px-4 py-2 text-xs">รีเซ็ต 3:3:2</button>` : ''}
+                        <div class="glass-card px-4 py-2 text-xs font-bold text-blue-400">ID: ${activeRoomId}</div>
                     </div>
                 </div>
-                <div class="glass-card p-4 overflow-auto custom-scroll" style="min-height: 70vh;">
+                <div class="map-wrapper custom-scroll">
                     <div id="roomMap">
-                        <div class="absolute top-10 left-1/2 -translate-x-1/2 w-64 h-8 bg-white/20 border border-white/30 rounded-xl flex items-center justify-center text-[10px] tracking-[5px] uppercase">Whiteboard</div>
+                        <div class="absolute top-10 left-1/2 -translate-x-1/2 w-64 h-8 bg-white/10 border border-white/20 rounded-xl flex items-center justify-center text-[8px] tracking-[10px] uppercase opacity-30">Whiteboard</div>
                         ${room.seats.map(s => {
-                            let state = s.bookedBy === currentUser.email ? 'my-seat' : (s.bookedBy ? 'booked' : 'available');
-                            let label = s.bookedBy === currentUser.email ? 'ME' : (s.bookedBy ? (isAdmin ? s.name.split(' ')[0] : 'จองแล้ว') : s.id);
+                            let state = '';
+                            if (s.bookedBy === currentUser.email) state = 'my-seat';
+                            else if (s.bookedBy) state = 'booked';
+                            
+                            let label = s.id;
+                            if (s.bookedBy) label = isStaff ? s.name.split(' ')[0] : (s.bookedBy === currentUser.email ? 'YOU' : 'จองแล้ว');
+
                             return `
                             <div id="desk-${s.id}" class="desk-container ${state}" style="left:${s.x}px; top:${s.y}px;" 
                                  onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
                                 <svg viewBox="0 0 100 110">
-                                    <rect x="25" y="80" width="50" height="25" rx="8" class="desk-chair" />
-                                    <rect x="5" y="10" width="90" height="60" rx="8" class="desk-top" />
+                                    <rect x="5" y="10" width="90" height="60" rx="12" class="desk-top" />
+                                    <rect x="25" y="80" width="50" height="20" rx="5" fill="rgba(255,255,255,0.2)" />
                                 </svg>
-                                <div class="absolute top-[28px] w-full text-center text-[10px] font-bold text-gray-800">${label}</div>
+                                <div class="desk-label">${label}</div>
                             </div>`;
                         }).join('')}
                     </div>
                 </div>`;
         }
 
-        // Logic Functions
-        async function resetTo332() {
-            const room = classrooms[activeRoomId];
-            const newLayout = calculate332Positions(room.seats.length);
-            newLayout.forEach((s, idx) => {
-                s.bookedBy = room.seats[idx].bookedBy;
-                s.name = room.seats[idx].name;
-            });
-            await db.collection("classrooms").doc(activeRoomId).update({ seats: newLayout });
-            Swal.fire({ icon: 'success', title: 'จัดเรียงสำเร็จ', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+        // --- 4. Logic Functions ---
+        function calculate332Positions(count) {
+            const seats = [];
+            const blockGap = 100, colW = 85, rowH = 110;
+            for (let i = 0; i < count; i++) {
+                let x; const row = Math.floor(i / 8), pos = i % 8;
+                if (pos < 3) x = pos * colW;
+                else if (pos < 6) x = pos * colW + blockGap;
+                else x = pos * colW + (blockGap * 2);
+                seats.push({ id: i + 1, x: x + 80, y: row * rowH + 150, bookedBy: null, name: null });
+            }
+            return seats;
         }
 
         async function createRoom() {
@@ -283,64 +265,130 @@
             if (!name || isNaN(count)) return;
             const id = Math.random().toString(36).substring(2, 8).toUpperCase();
             await db.collection("classrooms").doc(id).set({ name, seats: calculate332Positions(count) });
+            Swal.fire({icon:'success', title:'สร้างสำเร็จ', text:'รหัสห้อง: '+id});
         }
 
-        // Drag & Drop System
+        function joinRoom() {
+            const code = document.getElementById('joinCode').value.toUpperCase();
+            if (classrooms[code]) { activeRoomId = code; renderUI(); }
+            else Swal.fire({icon:'error', title:'ไม่พบห้อง'});
+        }
+
+        async function resetLayout() {
+            const room = classrooms[activeRoomId];
+            const newSeats = calculate332Positions(room.seats.length);
+            newSeats.forEach((s, i) => { if(room.seats[i]) { s.bookedBy = room.seats[i].bookedBy; s.name = room.seats[i].name; } });
+            await db.collection("classrooms").doc(activeRoomId).update({ seats: newSeats });
+        }
+
+        async function deleteRoom(id) {
+            const res = await Swal.fire({title:'ลบห้อง?', showCancelButton:true, confirmButtonColor:'#ef4444'});
+            if(res.isConfirmed) await db.collection("classrooms").doc(id).delete();
+        }
+
+        // --- 5. Drag & Booking ---
         let dragId = null, isMoving = false, startX, startY, initX, initY;
         function startDrag(e, id) {
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-            if (!isAdmin && classrooms[activeRoomId].seats.find(s => s.id === id).bookedBy) {
-                 if(classrooms[activeRoomId].seats.find(s => s.id === id).bookedBy !== currentUser.email) return;
-            }
+            const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
             dragId = id; isMoving = false;
             const ev = e.touches ? e.touches[0] : e;
             startX = ev.clientX; startY = ev.clientY;
-            const el = document.getElementById('desk-' + id);
+            const el = document.getElementById('desk-'+id);
             initX = parseInt(el.style.left); initY = parseInt(el.style.top);
-            if(isAdmin) el.classList.add('dragging');
+            if(isStaff) el.classList.add('dragging');
         }
 
-        document.addEventListener('mousemove', (e) => {
-            if (!dragId || !['super_admin', 'admin', 'teacher'].includes(currentUser.role)) return;
-            isMoving = true;
-            const dx = e.clientX - startX; const dy = e.clientY - startY;
-            const el = document.getElementById('desk-' + dragId);
-            el.style.left = (initX + dx) + 'px'; el.style.top = (initY + dy) + 'px';
-        });
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('touchmove', handleMove, {passive:false});
+        function handleMove(e) {
+            if(!dragId || !['super_admin', 'admin', 'teacher'].includes(currentUser.role)) return;
+            const ev = e.touches ? e.touches[0] : e;
+            const dx = ev.clientX - startX; const dy = ev.clientY - startY;
+            if(Math.abs(dx) > 5 || Math.abs(dy) > 5) isMoving = true;
+            if(isMoving) {
+                const el = document.getElementById('desk-'+dragId);
+                el.style.left = (initX + dx)+'px'; el.style.top = (initY + dy)+'px';
+            }
+        }
 
-        document.addEventListener('mouseup', async () => {
-            if (!dragId) return;
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-            if (isMoving && isAdmin) {
-                const el = document.getElementById('desk-' + dragId);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+        async function endDrag() {
+            if(!dragId) return;
+            const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            if(isMoving && isStaff) {
+                const el = document.getElementById('desk-'+dragId);
                 const room = classrooms[activeRoomId];
                 const seat = room.seats.find(s => s.id === dragId);
                 seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top);
                 await db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
-            } else if (!isMoving) {
+            } else if(!isMoving) {
                 handleBooking(dragId);
             }
-            if(isAdmin) document.getElementById('desk-' + dragId).classList.remove('dragging');
+            if(isStaff) document.getElementById('desk-'+dragId).classList.remove('dragging');
             dragId = null;
-        });
+        }
 
         async function handleBooking(sid) {
             const room = classrooms[activeRoomId];
             const seat = room.seats.find(s => s.id === sid);
-            const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
 
             if (seat.bookedBy) {
-                if (seat.bookedBy === currentUser.email || isAdmin) {
-                    const res = await Swal.fire({ title: 'ยกเลิกการจอง?', showCancelButton: true, confirmButtonText: 'ยืนยัน', background: '#1e3a8a', color: '#fff' });
-                    if (res.isConfirmed) { seat.bookedBy = null; seat.name = null; saveRoom(); }
+                if (seat.bookedBy === currentUser.email || isStaff) {
+                    const res = await Swal.fire({title:'ยกเลิกที่นั่ง?', showCancelButton:true});
+                    if(res.isConfirmed) { seat.bookedBy = null; seat.name = null; updateRoom(); }
                 }
             } else {
-                if (!isAdmin && room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire({icon: 'warning', title: 'คุณมีที่นั่งแล้ว'});
+                if (!isStaff && room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire({text:'คุณมีที่นั่งแล้ว'});
                 seat.bookedBy = currentUser.email; seat.name = currentUser.name;
-                saveRoom();
+                updateRoom();
             }
         }
-        function saveRoom() { db.collection("classrooms").doc(activeRoomId).update({ seats: classrooms[activeRoomId].seats }); }
+        function updateRoom() { db.collection("classrooms").doc(activeRoomId).update({ seats: classrooms[activeRoomId].seats }); }
+
+        // --- 6. User Management (The Missing Logic) ---
+        async function showUserManagement() {
+            const snap = await db.collection("users").get();
+            let rows = '';
+            snap.forEach(doc => {
+                const u = doc.data();
+                if(doc.id !== SUPER_ADMIN_EMAIL) {
+                    rows += `<div class="flex justify-between items-center p-3 glass-card mb-2">
+                        <div class="text-left"><p class="text-xs font-bold">${doc.id}</p><p class="text-[9px] opacity-50">${u.role}</p></div>
+                        <button onclick="removeRole('${doc.id}')" class="text-red-400"><i class='bx bx-trash'></i></button>
+                    </div>`;
+                }
+            });
+
+            Swal.fire({
+                title: 'จัดการสิทธิ์',
+                background: '#0f172a', color: '#fff',
+                html: `
+                    <input id="addEmail" class="hero-input w-full p-3 mb-2 text-sm" placeholder="อีเมล @ntun.ac.th">
+                    <select id="addRole" class="hero-input w-full p-3 mb-4 text-sm">
+                        ${currentUser.role === 'super_admin' ? '<option value="admin">Admin</option>' : ''}
+                        <option value="teacher">Teacher</option>
+                    </select>
+                    <button onclick="addRole()" class="btn-pill btn-primary w-full py-3 mb-6">เพิ่มสิทธิ์</button>
+                    <div class="max-h-60 overflow-auto">${rows || 'ไม่มีรายชื่อ'}</div>
+                `,
+                showConfirmButton: false
+            });
+        }
+
+        window.addRole = async () => {
+            const email = document.getElementById('addEmail').value.trim().toLowerCase();
+            const role = document.getElementById('addRole').value;
+            if(!email.endsWith('@ntun.ac.th')) return Swal.fire({text:'ต้องเป็นเมลโรงเรียน'});
+            await db.collection("users").doc(email).set({ role });
+            Swal.close(); showUserManagement();
+        };
+
+        window.removeRole = async (email) => {
+            await db.collection("users").doc(email).delete();
+            Swal.close(); showUserManagement();
+        };
 
         window.onload = initApp;
     </script>
