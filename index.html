@@ -17,11 +17,10 @@
     <style>
         body { 
             font-family: 'Kanit', sans-serif; 
-            background: #f2f2f7; /* iOS System Gray */
+            background: #f2f2f7; 
             color: #1c1c1e; touch-action: manipulation; 
         }
         
-        /* HeroUI Glass & Cards */
         .hero-card { 
             background: rgba(255, 255, 255, 0.7); 
             backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
@@ -42,7 +41,6 @@
         }
         .hero-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0, 122, 255, 0.15); }
 
-        /* Realistic Desk UI (Top-Down View) */
         .desk-container {
             width: 75px; height: 85px; position: absolute; cursor: pointer;
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -73,11 +71,15 @@
         }
         #roomMap { width: 1100px; height: 900px; position: relative; padding: 40px; }
 
-        /* Role Badges */
         .badge-super { background: #ff3b30; color: white; }
         .badge-admin { background: #ff9500; color: white; }
         .badge-teacher { background: #5856d6; color: white; }
         .badge-student { background: #007aff; color: white; }
+
+        /* Custom Scrollbar for Management List */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -89,10 +91,8 @@
             </div>
             <h1 class="text-3xl font-extrabold mb-1 tracking-tight text-gray-900">NTUN Space</h1>
             <p class="text-sm font-semibold text-gray-400 mb-10 tracking-widest uppercase">Classroom Manager</p>
-            
             <div id="g_id_onload" data-client_id="738644222886-o9uq6eonuu9hp8srsad1465lh9id41kj.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
             <div class="g_id_signin flex justify-center mb-6" data-type="standard" data-shape="pill" data-size="large"></div>
-            
             <p class="text-xs text-gray-400 font-medium"><i class='bx bxs-lock-alt'></i> เข้าสู่ระบบด้วยอีเมลโรงเรียนเท่านั้น</p>
         </div>
     </div>
@@ -135,7 +135,6 @@
         let activeRoomId = null;
         let classrooms = {};
 
-        // --- 2. Decode JWT แก้บั๊กภาษาต่างดาว ---
         function parseJwt(token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -146,8 +145,8 @@
         }
 
         async function handleGoogleLogin(response) {
-            const payload = parseJwt(response.credential); // ใช้ฟังก์ชันใหม่ถอดรหัส
-            const email = payload.email;
+            const payload = parseJwt(response.credential);
+            const email = payload.email.toLowerCase();
 
             if (!email.endsWith('@ntun.ac.th')) {
                 return Swal.fire({icon: 'error', title: 'ผิดพลาด', text: 'กรุณาใช้เมลโรงเรียน @ntun.ac.th', customClass: { popup: 'hero-card' }});
@@ -188,33 +187,23 @@
 
         function logout() { localStorage.removeItem('ntun_session_v5'); location.reload(); }
 
-        // --- 3. Layout Generator (3:3:2) ---
         function calculate332Positions(count) {
             const seats = [];
-            const blockGap = 90; // ทางเดิน
-            const colWidth = 95; // ระยะห่างซ้ายขวาของโต๊ะ
-            const rowHeight = 110; // ระยะห่างหน้าหลัง
-
+            const blockGap = 90;
+            const colWidth = 95;
+            const rowHeight = 110;
             for (let i = 0; i < count; i++) {
                 let x;
                 const row = Math.floor(i / 8);
                 const posInRow = i % 8;
-
-                if (posInRow < 3) x = posInRow * colWidth; // กลุ่มซ้าย (3)
-                else if (posInRow < 6) x = posInRow * colWidth + blockGap; // กลุ่มกลาง (3)
-                else x = posInRow * colWidth + (blockGap * 2); // กลุ่มขวา (2)
-
-                seats.push({
-                    id: i + 1,
-                    x: x + 60, // ขยับออกจากขอบซ้าย
-                    y: row * rowHeight + 120, // ขยับลงจากกระดานดำ
-                    bookedBy: null, name: null
-                });
+                if (posInRow < 3) x = posInRow * colWidth;
+                else if (posInRow < 6) x = posInRow * colWidth + blockGap;
+                else x = posInRow * colWidth + (blockGap * 2);
+                seats.push({ id: i + 1, x: x + 60, y: row * rowHeight + 120, bookedBy: null, name: null });
             }
             return seats;
         }
 
-        // --- 4. UI Renderer ---
         function renderUI() {
             if (activeRoomId && classrooms[activeRoomId]) renderRoomView();
             else renderDashboard();
@@ -224,9 +213,7 @@
             const area = document.getElementById('contentArea');
             const isAdminSide = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
             let html = ``;
-
             if (isAdminSide) {
-                // มุมมอง Admin / Teacher (เห็นรายชื่อห้อง และสร้างได้)
                 html += `
                 <div class="hero-card p-8 mb-10 flex flex-col md:flex-row gap-5 items-end relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 text-blue-500/10 text-9xl"><i class='bx bxs-magic-wand'></i></div>
@@ -241,7 +228,6 @@
                     <button onclick="createRoom()" class="w-full md:w-auto hero-btn px-10 py-4 text-lg relative z-10"><i class='bx bx-plus'></i> สร้างห้อง</button>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">`;
-                
                 for (const id in classrooms) {
                     html += `
                     <div onclick="openRoom('${id}')" class="hero-card p-6 cursor-pointer hover:-translate-y-2 transition-all duration-300 group">
@@ -258,7 +244,6 @@
                 }
                 html += `</div>`;
             } else {
-                // มุมมองนักเรียน (Student Flow) - บังคับกรอกรหัสเท่านั้น
                 html += `
                 <div class="max-w-md mx-auto hero-card p-10 text-center mt-10">
                     <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-[2rem] mx-auto mb-8 flex items-center justify-center text-white text-5xl shadow-lg shadow-blue-500/30">
@@ -277,7 +262,6 @@
             const room = classrooms[activeRoomId];
             const area = document.getElementById('contentArea');
             const isAdminSide = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-
             area.innerHTML = `
                 <div class="flex justify-between items-center mb-6">
                     <button onclick="activeRoomId=null; renderUI()" class="hero-card px-6 py-3 font-bold text-gray-700 hover:bg-white transition flex items-center gap-2"><i class='bx bx-chevron-left text-xl'></i> ออก</button>
@@ -286,28 +270,19 @@
                         <div class="hero-card px-6 py-3 font-black text-blue-600 text-sm tracking-widest uppercase flex items-center gap-2"><i class='bx bxs-discount'></i> ${activeRoomId}</div>
                     </div>
                 </div>
-                
                 <div class="map-wrapper">
                     <div class="sticky top-0 left-0 w-full pt-8 pb-4 bg-gradient-to-b from-[#e5e5ea] to-transparent z-10 flex flex-col items-center pointer-events-none">
                         <div class="w-80 h-10 bg-white border border-gray-200 rounded-xl shadow-sm flex items-center justify-center text-xs font-black tracking-[10px] text-gray-400 uppercase">Whiteboard</div>
                     </div>
                     <div id="roomMap">
                         ${room.seats.map(s => {
-                            let state = 'available';
-                            let displayLabel = s.id;
-                            
+                            let state = 'available', displayLabel = s.id;
                             if (s.bookedBy) {
-                                if (s.bookedBy === currentUser.email) {
-                                    state = 'my-seat'; displayLabel = "YOU";
-                                } else {
-                                    state = 'booked';
-                                    displayLabel = isAdminSide ? s.name.split(' ')[0] : 'จองแล้ว';
-                                }
+                                if (s.bookedBy === currentUser.email) { state = 'my-seat'; displayLabel = "YOU"; }
+                                else { state = 'booked'; displayLabel = isAdminSide ? s.name.split(' ')[0] : 'จองแล้ว'; }
                             }
-
                             return `
-                            <div id="desk-${s.id}" class="desk-container ${state}" style="left:${s.x}px; top:${s.y}px;" 
-                                 onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
+                            <div id="desk-${s.id}" class="desk-container ${state}" style="left:${s.x}px; top:${s.y}px;" onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
                                 <svg viewBox="0 0 100 110" width="100%" height="100%" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));">
                                     <rect x="25" y="80" width="50" height="25" rx="10" class="desk-chair" />
                                     <rect x="5" y="10" width="90" height="60" rx="8" class="desk-top" />
@@ -320,12 +295,10 @@
                 </div>`;
         }
 
-        // --- 5. Actions ---
         async function createRoom() {
             const name = document.getElementById('roomName').value;
             const count = parseInt(document.getElementById('roomCount').value);
             if (!name || !count) return;
-
             const id = Math.random().toString(36).substring(2, 8).toUpperCase();
             const seats = calculate332Positions(count);
             await db.collection("classrooms").doc(id).set({ name, seats });
@@ -335,10 +308,7 @@
         async function resetLayout() {
             const room = classrooms[activeRoomId];
             const newSeats = calculate332Positions(room.seats.length);
-            room.seats.forEach((oldSeat, idx) => {
-                newSeats[idx].bookedBy = oldSeat.bookedBy;
-                newSeats[idx].name = oldSeat.name;
-            });
+            room.seats.forEach((oldSeat, idx) => { if(newSeats[idx]) { newSeats[idx].bookedBy = oldSeat.bookedBy; newSeats[idx].name = oldSeat.name; } });
             await db.collection("classrooms").doc(activeRoomId).update({ seats: newSeats });
         }
 
@@ -356,9 +326,7 @@
             });
         }
 
-        // --- 6. Drag & Interaction ---
         let dragId = null, isMoving = false, startX, startY, initX, initY;
-
         function startDrag(e, id) {
             const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
             dragId = id; isMoving = false;
@@ -371,7 +339,6 @@
 
         document.addEventListener('mousemove', handleMove);
         document.addEventListener('touchmove', handleMove, {passive: false});
-
         function handleMove(e) {
             if(!dragId || !['super_admin', 'admin', 'teacher'].includes(currentUser.role)) return;
             const ev = e.touches ? e.touches[0] : e;
@@ -385,7 +352,6 @@
 
         document.addEventListener('mouseup', endDrag);
         document.addEventListener('touchend', endDrag);
-
         function endDrag() {
             if(!dragId) return;
             const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
@@ -395,9 +361,7 @@
                 const seat = room.seats.find(s => s.id === dragId);
                 seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top);
                 db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
-            } else if(!isMoving) {
-                handleBooking(dragId);
-            }
+            } else if(!isMoving) { handleBooking(dragId); }
             if(isAdmin) document.getElementById('desk-'+dragId).classList.remove('dragging');
             dragId = null;
         }
@@ -406,7 +370,6 @@
             const room = classrooms[activeRoomId];
             const seat = room.seats.find(s => s.id === sid);
             const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-
             if (seat.bookedBy) {
                 if (seat.bookedBy === currentUser.email || isAdmin) {
                     Swal.fire({ title: 'ยกเลิกที่นั่ง?', icon: 'question', showCancelButton: true, customClass: {popup: 'hero-card'} })
@@ -418,30 +381,86 @@
                 saveRoom();
             }
         }
-
         function saveRoom() { db.collection("classrooms").doc(activeRoomId).update({ seats: classrooms[activeRoomId].seats }); }
 
-        // --- 7. Management ---
-        function showUserManagement() {
-            Swal.fire({
-                title: 'เพิ่มผู้ดูแล',
-                html: `
-                    <input id="swalEmail" placeholder="อีเมล @ntun.ac.th" class="hero-input w-full p-4 mb-4 mt-4">
-                    <select id="swalRole" class="hero-input w-full p-4">
-                        ${currentUser.role === 'super_admin' ? '<option value="admin">Admin (ผู้ดูแลระบบ)</option>' : ''}
-                        <option value="teacher">Teacher (คุณครู)</option>
-                    </select>
-                `,
-                confirmButtonText: 'บันทึก', showCancelButton: true,
-                customClass: { popup: 'hero-card', confirmButton: 'hero-btn px-6 py-3', cancelButton: 'bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-bold ml-2' },
-                buttonsStyling: false,
-                preConfirm: () => {
-                    const email = document.getElementById('swalEmail').value;
-                    const role = document.getElementById('swalRole').value;
-                    if(!email.endsWith('@ntun.ac.th')) return Swal.showValidationMessage('เฉพาะอีเมล @ntun.ac.th');
-                    return db.collection("users").doc(email).set({ role, name: "Pending User" });
+        // --- 7. Management ระบบแก้ไขใหม่ (ดึงรายชื่อและลบได้) ---
+        async function showUserManagement() {
+            const snapshot = await db.collection("users").get();
+            let userRows = '';
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const email = doc.id;
+                if (email !== SUPER_ADMIN) {
+                    userRows += `
+                        <div class="flex justify-between items-center p-3 mb-2 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div class="text-left">
+                                <div class="text-sm font-bold text-gray-900">${email}</div>
+                                <div class="text-[10px] font-black uppercase tracking-widest text-blue-500">${data.role}</div>
+                            </div>
+                            <button onclick="removeUserRole('${email}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition">
+                                <i class='bx bx-x text-xl'></i>
+                            </button>
+                        </div>`;
                 }
-            }).then(res => { if(res.isConfirmed) Swal.fire({icon: 'success', title: 'เพิ่มสำเร็จ', customClass: {popup: 'hero-card'}}); });
+            });
+
+            Swal.fire({
+                title: 'จัดการสิทธิ์ผู้ใช้งาน',
+                html: `
+                    <div class="mb-6">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-left">เพิ่มคนใหม่</p>
+                        <input id="swalEmail" placeholder="อีเมล @ntun.ac.th" class="hero-input w-full p-4 mb-3">
+                        <select id="swalRole" class="hero-input w-full p-4 mb-4">
+                            ${currentUser.role === 'super_admin' ? '<option value="admin">Admin (ผู้ดูแลระบบ)</option>' : ''}
+                            <option value="teacher">Teacher (คุณครู)</option>
+                        </select>
+                        <button id="addBtn" class="hero-btn w-full py-3 text-sm">เพิ่มตำแหน่ง</button>
+                    </div>
+                    <hr class="mb-6 border-gray-100">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-left">รายชื่อผู้ดูแลปัจจุบัน</p>
+                    <div class="max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                        ${userRows || '<p class="text-gray-400 text-sm py-4 text-center">ไม่มีผู้ดูแลคนอื่น</p>'}
+                    </div>`,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: 'ปิดหน้าต่าง',
+                customClass: { popup: 'hero-card', cancelButton: 'bg-gray-200 text-gray-700 px-8 py-3 rounded-2xl font-bold mt-2' },
+                buttonsStyling: false,
+                didOpen: () => {
+                    document.getElementById('addBtn').onclick = async () => {
+                        const email = document.getElementById('swalEmail').value.trim().toLowerCase();
+                        const role = document.getElementById('swalRole').value;
+                        if(!email.endsWith('@ntun.ac.th')) return Swal.showValidationMessage('เฉพาะอีเมล @ntun.ac.th เท่านั้น');
+                        await db.collection("users").doc(email).set({ role, name: "Pending User" });
+                        Swal.close();
+                        Swal.fire({ icon: 'success', title: 'เพิ่มสำเร็จ', customClass: {popup: 'hero-card'}, timer: 1500 });
+                        setTimeout(showUserManagement, 1600);
+                    };
+                }
+            });
+        }
+
+        async function removeUserRole(email) {
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบยศ?',
+                text: `คุณต้องการถอนสิทธิ์ของ ${email} ใช่หรือไม่?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ใช่, ลบออก',
+                cancelButtonText: 'ยกเลิก',
+                customClass: { 
+                    popup: 'hero-card',
+                    confirmButton: 'bg-red-500 text-white px-6 py-3 rounded-2xl font-bold',
+                    cancelButton: 'bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-bold ml-2' 
+                },
+                buttonsStyling: false
+            });
+            if (result.isConfirmed) {
+                await db.collection("users").doc(email).delete();
+                Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', customClass: {popup: 'hero-card'}, timer: 1500 });
+                setTimeout(showUserManagement, 1600);
+            }
         }
     </script>
 </body>
