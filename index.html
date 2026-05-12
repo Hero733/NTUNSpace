@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NTUN Space - V12 (Standard Layout)</title>
+    <title>NTUN Space - Professional Seating</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,62 +22,99 @@
         }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .glass-pill { border-radius: 999px; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .desk { width: 65px; height: 80px; position: absolute; cursor: pointer; transition: transform 0.2s; }
-        .desk:hover { transform: scale(1.1); z-index: 50; }
-        .desk-top { fill: rgba(255, 255, 255, 0.1); stroke: rgba(255, 255, 255, 0.3); stroke-width: 2; rx: 10; }
+        
+        /* Seat Styles */
+        .desk { width: 60px; height: 70px; position: absolute; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .desk:hover { transform: scale(1.1); z-index: 10; }
+        .desk-top { fill: rgba(255, 255, 255, 0.1); stroke: rgba(255, 255, 255, 0.3); stroke-width: 2; rx: 8; }
         .booked .desk-top { fill: rgba(59, 130, 246, 0.5); stroke: #60a5fa; }
-        .my-seat .desk-top { fill: rgba(34, 197, 94, 0.6); stroke: #4ade80; filter: drop-shadow(0 0 10px rgba(34,197,94,0.4)); }
-        .desk-label { position: absolute; top: 28px; width: 100%; text-align: center; font-size: 10px; font-weight: 600; pointer-events: none; }
-        .map-container { background: rgba(0,0,0,0.2); border-radius: 40px; position: relative; }
-        input::placeholder { color: rgba(255,255,255,0.2); }
+        .my-seat .desk-top { fill: rgba(34, 197, 94, 0.5); stroke: #4ade80; filter: drop-shadow(0 0 8px rgba(34,197,94,0.4)); }
+        
+        .desk-label { position: absolute; top: 22px; width: 100%; text-align: center; font-size: 10px; font-weight: 500; pointer-events: none; }
+        
+        .map-area { 
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            border-radius: 2rem;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+        }
+
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.4s ease forwards; }
     </style>
 </head>
 <body>
+
     <div id="loginPage" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#0f172a]">
-        <div class="glass p-10 w-full max-w-sm text-center rounded-[2.5rem] shadow-2xl">
+        <div class="glass p-10 w-full max-w-sm text-center rounded-[2.5rem] shadow-2xl border-white/20">
+            <div class="w-20 h-20 bg-indigo-600 rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i class='bx bxs-graduation text-4xl text-white'></i>
+            </div>
             <h1 class="text-2xl font-bold mb-1">NTUN SPACE</h1>
-            <p class="text-white/40 mb-8 text-sm">Smart Seating Management</p>
-            <div id="g_id_onload" data-client_id="738644222886-o9uq6eonuu9hp8srsad1465lh9id41kj.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
-            <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill"></div>
+            <p class="text-white/40 mb-8 text-sm font-light">ระบบจัดการที่นั่งอัจฉริยะ</p>
+            
+            <div id="g_id_onload" 
+                 data-client_id="738644222886-o9uq6eonuu9hp8srsad1465lh9id41kj.apps.googleusercontent.com" 
+                 data-callback="handleGoogleLogin"></div>
+            <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill" data-theme="filled_blue"></div>
+            
+            <p class="mt-8 text-[10px] opacity-30 tracking-widest uppercase">@ntun.ac.th only</p>
         </div>
     </div>
 
     <div id="mainApp" class="hidden">
         <header class="p-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold">NT</div>
-                <div class="text-xs font-bold uppercase tracking-widest opacity-60">NTUN Space System</div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="glass-pill px-4 py-1.5 flex items-center gap-3">
-                    <img id="userImg" src="" class="w-7 h-7 rounded-full">
-                    <span id="userName" class="text-sm font-semibold"></span>
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/10">
+                    <i class='bx bxs-layout text-xl text-indigo-400'></i>
                 </div>
-                <button onclick="logout()" class="glass-pill p-2 hover:bg-red-500/20 text-red-400 transition"><i class='bx bx-power-off text-lg'></i></button>
+                <div>
+                    <h2 class="font-bold leading-none">NTUN SPACE</h2>
+                    <span class="text-[10px] opacity-40 uppercase tracking-tighter">Classroom Management v12</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="glass-pill pl-1 pr-4 py-1 flex items-center gap-3">
+                    <img id="userImg" src="" class="w-8 h-8 rounded-full">
+                    <span id="userName" class="text-xs font-medium"></span>
+                </div>
+                <button onclick="logout()" class="w-10 h-10 rounded-full glass hover:bg-red-500/20 transition flex items-center justify-center text-red-400 border-red-500/20">
+                    <i class='bx bx-log-out-circle text-xl'></i>
+                </button>
             </div>
         </header>
 
-        <main class="max-w-6xl mx-auto px-6 py-6">
-            <div id="studentZone" class="mb-10 text-center">
-                <div class="flex max-w-md mx-auto gap-2">
-                    <input id="joinCode" class="flex-1 glass p-4 rounded-2xl border-white/10 outline-none text-center font-black tracking-widest text-xl uppercase" placeholder="ENTER ROOM ID">
-                    <button onclick="joinByCode()" class="bg-indigo-600 px-8 rounded-2xl font-black hover:bg-indigo-500 transition">JOIN</button>
+        <main class="max-w-6xl mx-auto px-6 pb-20">
+            <section id="studentAction" class="mb-10 text-center animate-in">
+                <div class="max-w-md mx-auto">
+                    <h3 class="text-lg font-medium mb-4 opacity-80">กรอกรหัสเพื่อเข้าห้องเรียน</h3>
+                    <div class="flex gap-2">
+                        <input id="joinCode" class="flex-1 glass border-white/10 rounded-2xl px-6 py-4 text-center text-xl font-bold tracking-widest uppercase focus:outline-none focus:border-indigo-500 transition" placeholder="ROOM ID">
+                        <button onclick="joinByCode()" class="bg-indigo-600 hover:bg-indigo-500 px-8 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">JOIN</button>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div id="staffControls" class="hidden mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
-                <div class="relative w-full md:w-80">
-                    <i class='bx bx-search absolute left-4 top-1/2 -translate-y-1/2 opacity-30'></i>
-                    <input type="text" id="roomSearch" oninput="renderDashboard()" class="w-full glass-pill py-2.5 pl-12 pr-4 outline-none text-sm" placeholder="ค้นหาห้องเรียน...">
+            <section id="staffAction" class="hidden mb-10 animate-in">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="relative w-full md:w-96">
+                        <i class='bx bx-search absolute left-5 top-1/2 -translate-y-1/2 opacity-30 text-xl'></i>
+                        <input type="text" id="roomSearch" oninput="renderDashboard()" class="w-full glass-pill py-3 pl-14 pr-6 text-sm outline-none focus:border-white/30" placeholder="ค้นหาชื่อห้องเรียน หรือรหัส...">
+                    </div>
+                    <button onclick="showCreateModal()" class="w-full md:w-auto bg-white text-slate-900 px-8 py-3 rounded-full font-bold hover:bg-indigo-50 transition flex items-center justify-center gap-2">
+                        <i class='bx bx-plus-circle text-xl'></i> สร้างห้องใหม่
+                    </button>
                 </div>
-                <button onclick="showCreateModal()" class="bg-white text-indigo-900 px-6 py-2.5 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-indigo-50"><i class='bx bx-plus-circle'></i> สร้างห้องเรียน</button>
-            </div>
+            </section>
 
             <div id="contentArea"></div>
         </main>
     </div>
 
     <script>
+        // --- Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyAlaTyhtXf-d6qDSD5AeWR33Hg3VCn55o8",
             authDomain: "ntunspace.firebaseapp.com",
@@ -94,6 +131,7 @@
         let activeRoomId = null;
         let classrooms = {};
 
+        // --- Auth Functions ---
         function decodeJwt(token) {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -103,9 +141,14 @@
         async function handleGoogleLogin(response) {
             const payload = decodeJwt(response.credential);
             const email = payload.email.toLowerCase();
-            if (!email.endsWith('@ntun.ac.th')) return Swal.fire('Error', 'Use @ntun.ac.th', 'error');
             
+            if (!email.endsWith('@ntun.ac.th')) {
+                return Swal.fire({ icon: 'error', title: 'ไม่อนุญาต', text: 'กรุณาใช้เมลสถานศึกษา @ntun.ac.th', background: '#1e293b', color: '#fff' });
+            }
+
             let role = (email === SUPER_ADMIN) ? 'super_admin' : 'student';
+            // Check custom role in DB if needed (Extension point)
+            
             currentUser = { email, name: payload.name, role, picture: payload.picture };
             localStorage.setItem('ntun_session_v12', JSON.stringify(currentUser));
             initApp();
@@ -113,17 +156,18 @@
 
         function initApp() {
             const saved = localStorage.getItem('ntun_session_v12');
-            if (saved) currentUser = JSON.parse(saved);
-            if (!currentUser) return;
+            if (!saved) return;
+            currentUser = JSON.parse(saved);
 
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userName').innerText = currentUser.name;
             document.getElementById('userImg').src = currentUser.picture;
 
-            if (['super_admin', 'admin', 'teacher'].includes(currentUser.role)) {
-                document.getElementById('studentZone').classList.add('hidden');
-                document.getElementById('staffControls').classList.remove('hidden');
+            const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            if(isStaff) {
+                document.getElementById('studentAction').classList.add('hidden');
+                document.getElementById('staffAction').classList.remove('hidden');
             }
 
             db.collection("classrooms").onSnapshot(snap => {
@@ -134,52 +178,6 @@
         }
 
         function logout() { localStorage.removeItem('ntun_session_v12'); location.reload(); }
-
-        // --- Logic: Layout 3:3:2 ---
-        function calculateStandardPositions(count) {
-            const seats = [];
-            const colW = 85;       // ความกว้างโต๊ะ
-            const rowH = 110;      // ความสูงระหว่างแถว
-            const blockGap = 70;   // ช่องว่างทางเดิน
-            
-            for (let i = 0; i < count; i++) {
-                const row = Math.floor(i / 8); // 1 แถวมี 8 ตัว (3+3+2)
-                const pos = i % 8;             // ตำแหน่งในแถว
-                let xOffset = 0;
-
-                if (pos < 3) {
-                    xOffset = pos * colW; // กลุ่มที่ 1 (3 ตัว)
-                } else if (pos < 6) {
-                    xOffset = (pos * colW) + blockGap; // กลุ่มที่ 2 (3 ตัว)
-                } else {
-                    xOffset = (pos * colW) + (blockGap * 2); // กลุ่มที่ 3 (2 ตัว)
-                }
-
-                seats.push({
-                    id: i + 1,
-                    x: xOffset + 80, 
-                    y: (row * rowH) + 120,
-                    bookedBy: null,
-                    name: null
-                });
-            }
-            return seats;
-        }
-
-        async function resetLayout() {
-            const res = await Swal.fire({
-                title: 'จัดเรียง 3:3:2?',
-                text: "โต๊ะทั้งหมดจะกลับไปวางตามตำแหน่งมาตรฐาน",
-                icon: 'info',
-                showCancelButton: true,
-                background: '#1e293b', color: '#fff'
-            });
-            if (res.isConfirmed) {
-                const room = classrooms[activeRoomId];
-                room.seats = calculateStandardPositions(room.seats.length);
-                await db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
-            }
-        }
 
         // --- UI Rendering ---
         function renderUI() {
@@ -192,34 +190,44 @@
             const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
             const query = document.getElementById('roomSearch')?.value.toLowerCase() || '';
             
-            let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+            let html = '';
             if (isStaff) {
+                html = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
                 for (const id in classrooms) {
                     const room = classrooms[id];
-                    if (room.name.toLowerCase().includes(query)) {
+                    if (room.name.toLowerCase().includes(query) || id.toLowerCase().includes(query)) {
+                        const booked = room.seats.filter(s => s.bookedBy).length;
                         html += `
-                        <div class="glass p-6 rounded-[2rem] hover:border-white/20 transition">
-                            <div class="flex justify-between mb-4">
-                                <span class="text-[10px] bg-white/10 px-3 py-1 rounded-full font-mono">${id}</span>
-                                <button onclick="deleteRoom('${id}')" class="text-red-400 opacity-50 hover:opacity-100"><i class='bx bx-trash'></i></button>
+                        <div class="glass p-6 rounded-[2rem] hover:border-indigo-500/50 transition group animate-in">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest">${id}</span>
+                                <button onclick="deleteRoom('${id}')" class="text-white/20 hover:text-red-400 transition"><i class='bx bx-trash'></i></button>
                             </div>
-                            <h3 class="text-xl font-bold mb-6">${room.name}</h3>
-                            <button onclick="enterRoom('${id}')" class="w-full bg-indigo-600/40 hover:bg-indigo-600 py-3 rounded-xl transition font-bold text-sm">เข้าจัดการห้อง</button>
+                            <h3 class="text-xl font-bold mb-1">${room.name}</h3>
+                            <p class="text-xs text-white/40 mb-6">จองแล้ว ${booked} / ${room.seats.length} ที่นั่ง</p>
+                            <button onclick="enterRoom('${id}')" class="w-full bg-white/5 hover:bg-indigo-600 py-3 rounded-xl transition text-sm font-bold">เปิดห้องเรียน</button>
                         </div>`;
                     }
                 }
+                html += `</div>`;
             } else {
-                const myRoom = Object.keys(classrooms).find(id => classrooms[id].seats.some(s => s.bookedBy === currentUser.email));
-                if (myRoom) {
-                    html = `<div class="max-w-md mx-auto glass p-10 rounded-[3rem] text-center">
-                        <i class='bx bx-check-circle text-5xl text-green-400 mb-4'></i>
-                        <h3 class="text-2xl font-bold mb-2">จองสำเร็จ</h3>
-                        <p class="opacity-50 mb-8">คุณมีที่นั่งในห้อง ${classrooms[myRoom].name} แล้ว</p>
-                        <button onclick="enterRoom('${myRoom}')" class="w-full bg-indigo-600 py-4 rounded-2xl font-bold">ดูตำแหน่งที่นั่ง</button>
+                // Student: If already booked, show ticket
+                const myRoomId = Object.keys(classrooms).find(id => classrooms[id].seats.some(s => s.bookedBy === currentUser.email));
+                if (myRoomId) {
+                    const room = classrooms[myRoomId];
+                    const seat = room.seats.find(s => s.bookedBy === currentUser.email);
+                    html = `
+                    <div class="max-w-sm mx-auto glass p-8 rounded-[2.5rem] text-center animate-in">
+                        <div class="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                            <i class='bx bx-check-circle'></i>
+                        </div>
+                        <h3 class="text-xl font-bold">คุณจองที่นั่งแล้ว</h3>
+                        <p class="text-white/40 text-sm mb-6">${room.name} | ที่นั่งเลขที่ ${seat.id}</p>
+                        <button onclick="enterRoom('${myRoomId}')" class="w-full bg-indigo-600 py-4 rounded-2xl font-bold shadow-lg">ดูตำแหน่งที่นั่ง</button>
                     </div>`;
                 }
             }
-            area.innerHTML = html + '</div>';
+            area.innerHTML = html || `<p class="text-center opacity-20 py-10">ไม่พบข้อมูลห้องเรียน</p>`;
         }
 
         function renderRoomView() {
@@ -227,39 +235,39 @@
             const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
             
             document.getElementById('contentArea').innerHTML = `
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
-                    <button onclick="activeRoomId=null; renderUI()" class="glass-pill px-5 py-2 flex items-center gap-2 hover:bg-white/10 transition text-sm">
-                        <i class='bx bx-left-arrow-alt'></i> กลับหน้าหลัก
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 animate-in">
+                    <button onclick="activeRoomId=null; renderUI()" class="glass-pill px-6 py-2.5 flex items-center gap-2 hover:bg-white/10 transition text-sm">
+                        <i class='bx bx-chevron-left text-xl'></i> ย้อนกลับ
                     </button>
                     <div class="flex gap-2">
-                        ${isStaff ? `
-                            <button onclick="resetLayout()" class="glass-pill px-4 py-2 text-xs font-bold border-indigo-500/50 text-indigo-300 hover:bg-indigo-500/10">
-                                <i class='bx bx-grid-alt'></i> RESET (3:3:2)
-                            </button>
-                            <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 px-5 py-2 rounded-full text-xs font-bold transition flex items-center gap-2">
-                                <i class='bx bxs-file-export'></i> EXPORT
-                            </button>
-                        ` : ''}
-                        <div class="glass-pill px-6 py-2 text-sm font-bold bg-indigo-500/10">${room.name}</div>
+                        ${isStaff ? `<button onclick="exportExcel()" class="bg-emerald-600 hover:bg-emerald-500 px-6 py-2.5 rounded-full text-sm font-bold transition flex items-center gap-2">
+                            <i class='bx bxs-file-export'></i> EXPORT EXCEL
+                        </button>` : ''}
+                        <div class="glass-pill px-8 py-2.5 text-sm font-bold border-indigo-500/30 text-indigo-300">
+                            ${room.name}
+                        </div>
                     </div>
                 </div>
                 
-                <div class="map-container p-10 glass min-h-[600px] overflow-auto">
-                    <div class="relative w-[950px] h-[750px] mx-auto">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-2 bg-white/10 rounded-full"></div>
-                        <div class="absolute top-4 left-1/2 -translate-x-1/2 text-[9px] opacity-20 tracking-[0.5em] font-bold">WHITEBOARD</div>
+                <div class="map-area p-8 md:p-12 min-h-[600px] relative overflow-auto glass">
+                    <div class="w-[900px] h-[700px] mx-auto relative" id="roomCanvas">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-2 bg-indigo-500/30 rounded-full"></div>
+                        <div class="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.5em] opacity-20 font-bold uppercase">Whiteboard / Screen</div>
+
                         ${room.seats.map(s => {
-                            let state = s.bookedBy === currentUser.email ? 'my-seat' : (s.bookedBy ? 'booked' : '');
+                            const isMe = s.bookedBy === currentUser.email;
+                            const stateClass = isMe ? 'my-seat' : (s.bookedBy ? 'booked' : '');
                             let label = s.id;
-                            if (s.bookedBy === currentUser.email) label = 'ME';
+                            if (isMe) label = "ME";
                             else if (s.bookedBy && isStaff) label = s.name.split(' ')[0];
-                            else if (s.bookedBy) label = 'OCC';
+                            else if (s.bookedBy) label = "OCCUPIED";
 
                             return `
-                            <div id="desk-${s.id}" class="desk ${state}" style="left:${s.x}px; top:${s.y}px;" 
+                            <div id="desk-${s.id}" class="desk ${stateClass}" style="left:${s.x}px; top:${s.y}px;"
                                  onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
                                 <svg viewBox="0 0 100 110">
-                                    <rect x="10" y="10" width="80" height="70" class="desk-top" />
+                                    <rect x="10" y="10" width="80" height="65" class="desk-top" />
+                                    <path d="M35 85 Q50 95 65 85" fill="none" stroke="currentColor" stroke-width="2" class="opacity-10" />
                                 </svg>
                                 <div class="desk-label">${label}</div>
                             </div>`;
@@ -268,8 +276,54 @@
                 </div>`;
         }
 
-        // --- Drag & Drop Core ---
+        // --- Logic Functions ---
+        async function joinByCode() {
+            const code = document.getElementById('joinCode').value.trim().toUpperCase();
+            if (classrooms[code]) enterRoom(code);
+            else Swal.fire({ icon: 'warning', title: 'ไม่พบห้อง', text: 'รหัสห้องเรียนไม่ถูกต้อง', background: '#1e293b', color: '#fff' });
+        }
+
+        async function enterRoom(id) {
+            const room = classrooms[id];
+            const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+            
+            if (room.password && !isStaff) {
+                const { value: pass } = await Swal.fire({
+                    title: 'กรุณาใส่รหัสผ่านห้อง',
+                    input: 'password',
+                    inputAttributes: { autocapitalize: 'off' },
+                    showCancelButton: true,
+                    background: '#1e293b', color: '#fff'
+                });
+                if (pass !== room.password) return;
+            }
+            activeRoomId = id;
+            renderUI();
+        }
+
+        function exportExcel() {
+            const room = classrooms[activeRoomId];
+            const data = room.seats
+                .filter(s => s.bookedBy)
+                .map(s => ({
+                    "เลขที่นั่ง": s.id,
+                    "ชื่อ-นามสกุล": s.name,
+                    "อีเมล": s.bookedBy,
+                    "ห้องเรียน": room.name,
+                    "วันที่จอง": new Date().toLocaleDateString('th-TH')
+                }));
+
+            if (data.length === 0) return Swal.fire('ไม่พบข้อมูล', 'ยังไม่มีผู้ใช้งานจองที่นั่งในห้องนี้', 'info');
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "รายชื่อนักเรียน");
+            XLSX.writeFile(wb, `SeatPlan_${room.name}.xlsx`);
+        }
+
+        // --- Seat Interaction (Drag & Booking) ---
         let dragId = null, isMoving = false, startX, startY, initX, initY;
+
         function startDrag(e, id) {
             dragId = id; isMoving = false;
             const ev = e.touches ? e.touches[0] : e;
@@ -309,72 +363,74 @@
 
             if (seat.bookedBy) {
                 if (seat.bookedBy === currentUser.email || isStaff) {
-                    const res = await Swal.fire({ title: 'ยกเลิกการจอง?', icon: 'warning', showCancelButton: true, background: '#1e293b', color: '#fff' });
-                    if(res.isConfirmed) { seat.bookedBy = null; seat.name = null; updateRoom(); }
+                    const res = await Swal.fire({ 
+                        title: 'ยกเลิกการจอง?', 
+                        text: `คุณต้องการยกเลิกการจองที่นั่งหมายเลข ${sid} ใช่หรือไม่?`,
+                        icon: 'question', 
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        background: '#1e293b', color: '#fff'
+                    });
+                    if(res.isConfirmed) { 
+                        seat.bookedBy = null; seat.name = null; 
+                        db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
+                    }
                 }
             } else {
-                if (!isStaff && room.seats.some(s => s.bookedBy === currentUser.email)) return;
-                seat.bookedBy = currentUser.email; seat.name = currentUser.name;
-                updateRoom();
+                // Student can only book one seat
+                if (!isStaff && room.seats.some(s => s.bookedBy === currentUser.email)) {
+                    return Swal.fire('จองแล้ว', 'คุณมีที่นั่งในห้องนี้แล้ว ไม่สามารถจองเพิ่มได้', 'warning');
+                }
+                seat.bookedBy = currentUser.email; 
+                seat.name = currentUser.name;
+                db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
             }
         }
 
-        function updateRoom() { db.collection("classrooms").doc(activeRoomId).update({ seats: classrooms[activeRoomId].seats }); }
-
+        // --- Room Management ---
         function showCreateModal() {
             Swal.fire({
                 title: 'สร้างห้องเรียนใหม่',
                 background: '#1e293b', color: '#fff',
                 html: `
-                    <input id="swal-name" class="swal2-input text-slate-900" placeholder="ชื่อห้อง (เช่น ม.6/1)">
-                    <input id="swal-count" type="number" class="swal2-input text-slate-900" placeholder="จำนวนที่นั่ง">
-                    <input id="swal-pass" class="swal2-input text-slate-900" placeholder="รหัสเข้าห้อง (ถ้ามี)">
-                `,
-                preConfirm: () => [document.getElementById('swal-name').value, document.getElementById('swal-count').value, document.getElementById('swal-pass').value]
+                    <div class="text-left space-y-4 p-2">
+                        <label class="text-xs opacity-50 uppercase">ชื่อห้องเรียน</label>
+                        <input id="swal-name" class="w-full bg-slate-800 border border-white/10 p-3 rounded-xl" placeholder="เช่น ม.6/1 (คาบเช้า)">
+                        <label class="text-xs opacity-50 uppercase">จำนวนที่นั่ง</label>
+                        <input id="swal-count" type="number" class="w-full bg-slate-800 border border-white/10 p-3 rounded-xl" placeholder="เช่น 40">
+                        <label class="text-xs opacity-50 uppercase">รหัสผ่าน (ถ้ามี)</label>
+                        <input id="swal-pass" class="w-full bg-slate-800 border border-white/10 p-3 rounded-xl" placeholder="เว้นว่างไว้หากไม่ต้องใช้">
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'สร้างห้อง',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-name').value;
+                    const count = document.getElementById('swal-count').value;
+                    if (!name || !count) return Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบ');
+                    return [name, count, document.getElementById('swal-pass').value];
+                }
             }).then(res => {
                 if(res.isConfirmed) {
                     const [name, count, pass] = res.value;
                     const id = Math.random().toString(36).substring(2, 8).toUpperCase();
-                    db.collection("classrooms").doc(id).set({
-                        name,
-                        seats: calculateStandardPositions(parseInt(count)),
-                        password: pass || null
-                    });
+                    const seats = [];
+                    // Initial grid layout
+                    for(let i=0; i<parseInt(count); i++) {
+                        seats.push({
+                            id: i+1,
+                            x: (i % 8) * 100 + 50,
+                            y: Math.floor(i / 8) * 120 + 100,
+                            bookedBy: null, name: null
+                        });
+                    }
+                    db.collection("classrooms").doc(id).set({ name, seats, password: pass || null });
                 }
             });
         }
 
-        async function joinByCode() {
-            const code = document.getElementById('joinCode').value.trim().toUpperCase();
-            if (classrooms[code]) enterRoom(code);
-            else Swal.fire('ไม่พบห้อง', 'รหัสไม่ถูกต้อง', 'error');
-        }
-
-        async function enterRoom(id) {
-            const room = classrooms[id];
-            if (room.password && !['super_admin', 'admin', 'teacher'].includes(currentUser.role)) {
-                const { value: pass } = await Swal.fire({ title: 'Password', input: 'password', background: '#1e293b', color: '#fff' });
-                if (pass !== room.password) return;
-            }
-            activeRoomId = id;
-            renderUI();
-        }
-
         async function deleteRoom(id) {
-            const res = await Swal.fire({ title: 'ลบห้องเรียน?', icon: 'error', showCancelButton: true });
+            const res = await Swal.fire({ title: 'ลบห้องเรียน?', text: 'ข้อมูลการจองทั้งหมดจะหายไป', icon: 'warning', showCancelButton: true, background: '#1e293b', color: '#fff' });
             if(res.isConfirmed) await db.collection("classrooms").doc(id).delete();
-        }
-
-        function exportToExcel() {
-            const room = classrooms[activeRoomId];
-            const data = room.seats.filter(s => s.bookedBy).map(s => ({
-                "ที่นั่ง": s.id, "ชื่อ": s.name, "อีเมล": s.bookedBy, "ห้อง": room.name
-            }));
-            if (data.length === 0) return Swal.fire('ข้อมูลว่างเปล่า', '', 'info');
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Students");
-            XLSX.writeFile(wb, `NTUN_${room.name}.xlsx`);
         }
 
         window.onload = initApp;
