@@ -3,137 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NTUN Space - Artistic Starry Classroom</title>
+    <title>NTUN Space - The Artistic Galaxy Edition</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
-            --accent: #30d158;
-            --glass: rgba(255, 255, 255, 0.12);
-            --glass-strong: rgba(255, 255, 255, 0.2);
+            --primary-glow: #30d158;
+            --accent-purple: #8b5cf6;
+            --bg-dark: #1a1c2c;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
+        /* --- 1. Artistic Galaxy Background --- */
         body { 
             font-family: 'Kanit', sans-serif; 
-            /* พื้นหลังไล่สีแบบ Artistic ตามรูปต้นฉบับ */
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 40%, #8b5cf6 70%, #d8b4fe 100%);
+            background: radial-gradient(circle at 50% 50%, #2c3e50 0%, #000000 100%);
             background-attachment: fixed;
             min-height: 100vh;
             color: white;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* เอฟเฟกต์ละอองดาวแบบ Art */
-        body::before {
-            content: "";
+        .space-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(at 0% 0%, rgba(74, 144, 226, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            z-index: -1;
+        }
+
+        /* ละอองดาวแบบละเอียดตามรูปต้นฉบับ */
+        .stardust {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.4; pointer-events: none; z-index: -1;
+            opacity: 0.3; z-index: -1; pointer-events: none;
         }
 
-        .glass-ui {
-            background: var(--glass);
+        /* --- 2. Advanced Glassmorphism (iOS 26.5 Style) --- */
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 28px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* หน้ากระดานแบบยาวสมดุล */
-        .whiteboard-box {
-            width: 70%;
-            height: 14px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.8), #fff, rgba(255,255,255,0.8));
-            border-radius: 40px;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
-            margin: 0 auto 50px;
-            display: flex; align-items: center; justify-content: center;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* พื้นที่จำลองห้องเรียน */
-        .classroom-container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
-            aspect-ratio: 16/10;
+        /* --- 3. Progress Bar & Status Badge --- */
+        .status-badge {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--primary-glow);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .progress-rail {
+            width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px; position: relative; overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%; background: linear-gradient(90deg, #32ff7e, #30d158);
+            box-shadow: 0 0 15px rgba(48, 209, 88, 0.6);
+            border-radius: 20px; transition: width 1s ease-in-out;
+        }
+
+        /* --- 4. Smart Classroom Map (Realistic) --- */
+        .classroom-viewport {
+            width: 100%; max-width: 1100px; margin: 0 auto;
+            background: rgba(0,0,0,0.2); border-radius: 40px;
+            padding: 50px; position: relative; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        #roomMap { 
+            position: relative; width: 100%; height: 650px; 
+            perspective: 1000px;
+        }
+
+        .desk-3d {
+            position: absolute; width: 85px; height: 95px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .desk-3d:hover { transform: translateY(-5px) scale(1.05); }
+
+        .desk-body { fill: #ffffff; rx: 12; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.2)); }
+        .chair-body { fill: rgba(255,255,255,0.25); rx: 8; }
+        
+        .booked .desk-body { fill: #ff453a; }
+        .my-seat .desk-body { fill: var(--primary-glow); }
+
+        .desk-text { font-size: 11px; font-weight: 800; fill: #1c1c1e; }
+
+        /* --- 5. Whiteboard Styling --- */
+        .whiteboard-long {
+            width: 70%; height: 10px; background: white;
+            border-radius: 50px; margin: 0 auto 60px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
             position: relative;
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 40px;
-            padding: 40px;
-            display: flex; flex-direction: column;
+        }
+        .whiteboard-long::after {
+            content: "WHITEBOARD"; position: absolute; top: 15px; width: 100%;
+            text-align: center; font-size: 9px; letter-spacing: 12px; opacity: 0.3;
         }
 
-        /* โมเดลโต๊ะเรียนแบบสมจริง */
-        .desk-block {
-            position: absolute;
-            width: 90px; height: 100px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .desk-shape {
-            fill: #ffffff;
-            stroke: rgba(0,0,0,0.1); stroke-width: 1;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-        }
-
-        .chair-shape { fill: rgba(255,255,255,0.3); }
-
-        .booked .desk-shape { fill: #ff4d4d; }
-        .my-seat .desk-shape { fill: var(--accent); }
-
-        .desk-label {
-            position: absolute; top: 18%; width: 100%; text-align: center;
-            font-size: 13px; font-weight: 800; color: #1c1c1e;
-            pointer-events: none;
-        }
-
-        /* ซ่อน Scrollbar */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
         @media (max-width: 768px) {
-            .classroom-container { transform: scale(0.7); margin-top: -50px; }
-            .desk-block { width: 70px; height: 80px; }
+            #roomMap { transform: scale(0.6); transform-origin: top center; height: 450px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loginPage" class="fixed inset-0 z-[200] flex items-center justify-center p-6">
-        <div class="glass-ui p-12 w-full max-w-md text-center">
-            <div class="w-24 h-24 bg-white/20 rounded-[2.5rem] mx-auto mb-8 flex items-center justify-center text-white text-5xl shadow-xl">
-                <i class='bx bxs-graduation'></i>
+    <div class="space-overlay"></div>
+    <div class="stardust"></div>
+
+    <div id="loginPage" class="fixed inset-0 z-[500] flex items-center justify-center p-6">
+        <div class="glass-card p-12 w-full max-w-md text-center border-white/20">
+            <div class="w-24 h-24 bg-white/10 rounded-[2.8rem] mx-auto mb-8 flex items-center justify-center text-white text-5xl shadow-2xl border border-white/20">
+                <i class='bx bxs-planet'></i>
             </div>
-            <h1 class="text-4xl font-bold mb-2">NTUN Space</h1>
-            <p class="opacity-60 mb-10 font-light">จองโต๊ะเรียนออนไลน์แบบสมจริง</p>
+            <h1 class="text-4xl font-bold mb-2 tracking-tight">NTUN SPACE</h1>
+            <p class="text-white/40 mb-10 font-light uppercase tracking-widest text-xs">The Artistic Reservation</p>
             <div id="g_id_onload" data-client_id="738644222886-o9uq6eonuu9hp8srsad1465lh9id41kj.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
             <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill" data-size="large" data-theme="filled_blue"></div>
         </div>
     </div>
 
-    <div id="mainApp" class="hidden min-h-screen flex flex-col p-4 md:p-8 max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-12">
-            <div class="glass-ui px-6 py-3 flex items-center gap-3">
-                <i class='bx bxs-dashboard text-2xl'></i>
-                <span id="userName" class="font-bold">Loading...</span>
+    <div id="mainApp" class="hidden min-h-screen flex flex-col p-4 md:p-10 max-w-7xl mx-auto">
+        
+        <header class="flex justify-between items-center mb-16">
+            <div class="glass-pill px-6 py-3 flex items-center gap-4">
+                <img src="https://upload.wikimedia.org/wikipedia/th/thumb/f/f4/Emblem_of_Nawaminthrachinuthit_Triam_Udom_Suksa_Nomklao_School.png/220px-Emblem_of_Nawaminthrachinuthit_Triam_Udom_Suksa_Nomklao_School.png" class="w-8 h-8 object-contain">
+                <span class="text-sm font-bold tracking-tight border-l border-white/20 pl-4">ระบบลงทะเบียนที่นั่ง</span>
             </div>
-            <button onclick="logout()" class="glass-ui w-12 h-12 flex items-center justify-center text-red-400 hover:bg-white/20 transition-all">
-                <i class='bx bx-power-off text-2xl'></i>
-            </button>
+
+            <div class="flex items-center gap-4">
+                <div class="glass-pill pl-2 pr-6 py-2 flex items-center gap-3">
+                    <img id="userImg" src="" class="w-10 h-10 rounded-full border border-white/30 shadow-lg">
+                    <div>
+                        <p id="userName" class="text-sm font-bold leading-none mb-1">Name</p>
+                        <p id="userRole" class="text-[9px] opacity-50 uppercase font-black">Student</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-12 h-12 glass-pill flex items-center justify-center text-red-400 hover:bg-red-500/20"><i class='bx bx-log-out-circle text-xl'></i></button>
+            </div>
         </header>
+
+        <section class="mb-12">
+            <p class="text-white/50 text-xl font-light mb-2">ยินดีต้อนรับกลับมา,</p>
+            <h1 id="heroName" class="text-6xl font-bold mb-6">สวัสดี, User</h1>
+            <div class="glass-pill inline-flex items-center gap-3 px-5 py-2 text-[11px] font-bold tracking-widest text-white/80">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                ช่วงที่ 2A — ลงทะเบียนโต๊ะเรียน
+            </div>
+        </section>
 
         <div id="contentArea"></div>
     </div>
 
     <script>
+        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyAlaTyhtXf-d6qDSD5AeWR33Hg3VCn55o8",
             authDomain: "ntunspace.firebaseapp.com",
@@ -150,6 +201,7 @@
         let activeRoomId = null;
         let classrooms = {};
 
+        // --- Auth Functions ---
         function parseJwt(token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -159,7 +211,7 @@
         async function handleGoogleLogin(response) {
             const payload = parseJwt(response.credential);
             const email = payload.email.toLowerCase();
-            if (!email.endsWith('@ntun.ac.th')) return;
+            if (!email.endsWith('@ntun.ac.th')) return Swal.fire({icon:'error', title:'Email Error', text:'@ntun.ac.th เท่านั้น', customClass:{popup:'glass-card'}});
 
             let role = 'student';
             const userDoc = await db.collection("users").doc(email).get();
@@ -167,17 +219,20 @@
             else if (userDoc.exists) role = userDoc.data().role;
 
             currentUser = { email, name: payload.name, role, picture: payload.picture };
-            localStorage.setItem('ntun_art_session', JSON.stringify(currentUser));
+            localStorage.setItem('ntun_art_v5', JSON.stringify(currentUser));
             initApp();
         }
 
-        const saved = localStorage.getItem('ntun_art_session');
+        const saved = localStorage.getItem('ntun_art_v5');
         if (saved) { currentUser = JSON.parse(saved); initApp(); }
 
         function initApp() {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userName').innerText = currentUser.name.split(' ')[0];
+            document.getElementById('heroName').innerText = `สวัสดี, ${currentUser.name.split(' ')[0]}`;
+            document.getElementById('userName').innerText = currentUser.name;
+            document.getElementById('userImg').src = currentUser.picture;
+            document.getElementById('userRole').innerText = currentUser.role;
 
             db.collection("classrooms").onSnapshot(snap => {
                 classrooms = {};
@@ -186,6 +241,7 @@
             });
         }
 
+        // --- UI Rendering (Artistic Dashboard) ---
         function renderUI() {
             if (activeRoomId && classrooms[activeRoomId]) renderRoomView();
             else renderDashboard();
@@ -194,27 +250,41 @@
         function renderDashboard() {
             const area = document.getElementById('contentArea');
             const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
-            let html = `<div class="mb-8"><h1 class="text-5xl font-bold">สวัสดี, ${currentUser.name.split(' ')[0]}</h1><p class="opacity-50 mt-2">พื้นที่สำหรับจัดการการจองโต๊ะเรียนของคุณ</p></div>`;
+            let html = `<div class="flex items-center gap-4 mb-8 opacity-60"><i class='bx bxs-grid-alt text-2xl'></i> <h2 class="text-2xl font-bold uppercase tracking-widest">ห้องเรียนที่เปิดใช้งาน</h2></div>`;
 
             if (isAdmin) {
                 html += `
-                <div class="glass-ui p-8 mb-10 flex flex-wrap gap-4 items-end">
-                    <div class="flex-1 min-w-[200px]"><label class="text-xs font-bold opacity-40 ml-2 mb-2 block">ชื่อห้องเรียน</label><input id="roomName" type="text" placeholder="ม.x/x" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white"></div>
-                    <button onclick="createRoom()" class="glass-ui bg-blue-600 px-10 py-4 font-bold border-none">สร้างห้องเรียน</button>
-                    <button onclick="showUserManagement()" class="glass-ui px-6 py-4 font-bold"><i class='bx bxs-user-detail'></i> สิทธิ์</button>
+                <div class="glass-card p-10 mb-12 flex flex-wrap gap-6 items-end">
+                    <div class="flex-1 min-w-[250px]"><label class="text-[10px] font-black opacity-30 mb-3 block uppercase tracking-[3px]">ชื่อห้องเรียน / ชุมนุม</label><input id="roomName" type="text" placeholder="ม.3/1 หรือ โปรแกรมมิ่ง" class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white placeholder:text-white/20 focus:bg-white/10 outline-none transition-all"></div>
+                    <div class="w-32"><label class="text-[10px] font-black opacity-30 mb-3 block uppercase tracking-[3px]">จำนวนโต๊ะ</label><input id="roomCount" type="number" value="40" class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center"></div>
+                    <button onclick="createRoom()" class="glass-pill bg-white/10 px-10 py-5 font-bold hover:bg-white/20 transition-all border-white/20">สร้างห้องใหม่</button>
+                    <button onclick="showUserManagement()" class="glass-pill bg-blue-500/20 border-blue-500/30 px-8 py-5 font-bold text-blue-400 ml-auto">จัดการครู/แอดมิน</button>
                 </div>`;
             }
 
-            html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-10">`;
             for (const id in classrooms) {
+                const c = classrooms[id];
+                const booked = c.seats.filter(s => s.bookedBy).length;
+                const percent = (booked / c.seats.length) * 100;
+                const isMyRoom = c.seats.some(s => s.bookedBy === currentUser.email);
+
                 html += `
-                <div onclick="openRoom('${id}')" class="glass-ui p-8 cursor-pointer hover:bg-white/20 transition-all group">
-                    <div class="flex justify-between items-start mb-6">
-                        <i class='bx bxs-door-open text-4xl opacity-40'></i>
-                        <button onclick="event.stopPropagation(); deleteRoom('${id}')" class="text-white/20 hover:text-red-400"><i class='bx bx-trash'></i></button>
+                <div onclick="openRoom('${id}')" class="glass-card p-10 cursor-pointer relative overflow-hidden group hover:border-white/30 transition-all">
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <h3 class="text-3xl font-bold mb-2">${c.name}</h3>
+                            <p class="text-white/30 text-[10px] uppercase font-bold tracking-[4px]">ROOM ID: ${id}</p>
+                        </div>
+                        ${isMyRoom ? `<span class="status-badge"><i class='bx bxs-check-circle'></i> จองสำเร็จ</span>` : `<i class='bx bxs-chevron-right text-3xl opacity-20'></i>`}
                     </div>
-                    <h3 class="text-2xl font-bold">${classrooms[id].name}</h3>
-                    <p class="text-xs opacity-40 uppercase tracking-widest mt-1">Room ID: ${id}</p>
+                    <p class="text-white/40 text-sm mb-10 font-light leading-relaxed">พัฒนาและเรียนรู้ทักษะในห้องเรียน NTUN Space พร้อมระบบเช็คชื่ออัตโนมัติ</p>
+                    <div class="flex justify-between text-[11px] font-black mb-4 uppercase opacity-60">
+                        <span>ความจุที่นั่ง</span>
+                        <span>${booked} / ${c.seats.length} คน</span>
+                    </div>
+                    <div class="progress-rail"><div class="progress-bar" style="width: ${percent}%"></div></div>
+                    ${isAdmin ? `<button onclick="event.stopPropagation(); deleteRoom('${id}')" class="absolute bottom-4 right-6 text-white/20 hover:text-red-400 text-xl"><i class='bx bx-trash'></i></button>` : ''}
                 </div>`;
             }
             html += `</div>`;
@@ -227,16 +297,15 @@
             const isAdmin = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
             
             area.innerHTML = `
-                <div class="flex justify-between items-center mb-8">
-                    <button onclick="activeRoomId=null; renderUI()" class="glass-ui px-6 py-3 flex items-center gap-2 font-bold"><i class='bx bx-left-arrow-alt'></i> กลับ</button>
-                    <div class="flex gap-2">
-                        ${isAdmin ? `<button onclick="resetTo332()" class="glass-ui bg-orange-500/20 text-orange-300 px-4 py-3 text-sm font-bold"><i class='bx bx-refresh'></i> จัดโต๊ะ 3:3:2</button>` : ''}
-                        <div class="glass-ui px-6 py-3 text-sm font-bold opacity-60 uppercase">${room.name}</div>
+                <div class="flex justify-between items-center mb-10">
+                    <button onclick="activeRoomId=null; renderUI()" class="glass-pill px-8 py-3 flex items-center gap-3 font-bold text-sm"><i class='bx bx-chevron-left text-xl'></i> ย้อนกลับ</button>
+                    <div class="flex gap-4">
+                        ${isAdmin ? `<button onclick="resetTo332()" class="glass-pill bg-white/10 px-6 py-3 text-xs font-bold"><i class='bx bx-refresh'></i> จัดโต๊ะ 3:3:2</button>` : ''}
+                        <div class="glass-pill px-6 py-3 font-black text-xs opacity-40 uppercase tracking-widest">${room.name}</div>
                     </div>
                 </div>
-                
-                <div class="classroom-container">
-                    <div class="whiteboard-box"><p class="text-[8px] font-black tracking-[12px] opacity-20 text-black uppercase">Whiteboard</p></div>
+                <div class="classroom-viewport glass-card">
+                    <div class="whiteboard-long"></div>
                     <div id="roomMap">
                         ${room.seats.map(s => {
                             let state = '', display = s.id;
@@ -245,52 +314,48 @@
                                 else { state = 'booked'; display = isAdmin ? s.name.split(' ')[0] : 'FULL'; }
                             }
                             return `
-                            <div id="desk-${s.id}" class="desk-block ${state}" style="left:${s.x}px; top:${s.y}px;" onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
+                            <div id="desk-${s.id}" class="desk-3d ${state}" style="left:${s.x}%; top:${s.y}%;" onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
                                 <svg class="w-full h-full" viewBox="0 0 100 110">
-                                    <rect x="25" y="80" width="50" height="20" rx="6" class="chair-shape" />
-                                    <rect x="5" y="10" width="90" height="65" rx="10" class="desk-shape" />
-                                    <rect x="15" y="20" width="70" height="3" rx="1" fill="rgba(0,0,0,0.05)" />
+                                    <rect x="25" y="80" width="50" height="20" class="chair-body" />
+                                    <rect x="5" y="10" width="90" height="65" class="desk-body" />
+                                    <text x="50" y="48" text-anchor="middle" class="desk-text">${display}</text>
                                 </svg>
-                                <div class="desk-label">${display}</div>
                             </div>`;
                         }).join('')}
                     </div>
                 </div>`;
         }
 
-        // --- Logic Functions ---
-        async function createRoom() {
-            const name = document.getElementById('roomName').value;
-            if (!name) return;
-            const id = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const seats = [];
-            for (let i = 0; i < 40; i++) {
-                const row = Math.floor(i / 8);
-                const col = i % 8;
-                let x = 0;
-                if (col < 3) x = 50 + (col * 110);
-                else if (col < 6) x = 110 + (col * 110);
-                else x = 170 + (col * 110);
-                seats.push({ id: i+1, x, y: 10 + (row * 130), bookedBy: null, name: null });
-            }
-            await db.collection("classrooms").doc(id).set({ name, seats });
-        }
-
+        // --- Smart Layout & Interaction Logic ---
         function resetTo332() {
             const room = classrooms[activeRoomId];
             room.seats.forEach((s, i) => {
                 const row = Math.floor(i / 8);
                 const col = i % 8;
                 let x = 0;
-                if (col < 3) x = 50 + (col * 110);
-                else if (col < 6) x = 110 + (col * 110);
-                else x = 170 + (col * 110);
-                s.x = x; s.y = 10 + (row * 130);
+                if (col < 3) x = 5 + (col * 11);
+                else if (col < 6) x = 12 + (col * 11);
+                else x = 19 + (col * 11);
+                s.x = x; s.y = row * 18;
             });
-            db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
+            saveRoom();
         }
 
-        // --- Drag & Booking ---
+        async function createRoom() {
+            const name = document.getElementById('roomName').value;
+            const count = parseInt(document.getElementById('roomCount').value);
+            if (!name) return;
+            const id = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const seats = [];
+            for (let i = 0; i < count; i++) {
+                const row = Math.floor(i / 8), col = i % 8;
+                let x = (col < 3) ? 5 + (col * 11) : (col < 6) ? 12 + (col * 11) : 19 + (col * 11);
+                seats.push({ id: i + 1, x, y: row * 18, bookedBy: null, name: null });
+            }
+            await db.collection("classrooms").doc(id).set({ name, seats });
+        }
+
+        // --- Drag & Booking Handler ---
         let dragId = null, isMoving = false, startX, startY, initX, initY;
         function startDrag(e, id) {
             const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
@@ -298,7 +363,7 @@
             const ev = e.touches ? e.touches[0] : e;
             startX = ev.clientX; startY = ev.clientY;
             const el = document.getElementById('desk-'+id);
-            initX = parseInt(el.style.left); initY = parseInt(el.style.top);
+            initX = parseFloat(el.style.left); initY = parseFloat(el.style.top);
         }
 
         document.addEventListener('mousemove', e => handleMove(e));
@@ -306,21 +371,23 @@
         function handleMove(e) {
             if(!dragId || !['super_admin','admin','teacher'].includes(currentUser.role)) return;
             const ev = e.touches ? e.touches[0] : e;
-            const dx = ev.clientX - startX, dy = ev.clientY - startY;
-            if(Math.abs(dx) > 5 || Math.abs(dy) > 5) isMoving = true;
+            const viewport = document.getElementById('roomMap').getBoundingClientRect();
+            const dx = ((ev.clientX - startX) / viewport.width) * 100;
+            const dy = ((ev.clientY - startY) / viewport.height) * 100;
+            if(Math.abs(dx) > 0.5) isMoving = true;
             if(isMoving) {
                 const el = document.getElementById('desk-'+dragId);
-                el.style.left = (initX + dx)+'px'; el.style.top = (initY + dy)+'px';
+                el.style.left = (initX + dx)+'%'; el.style.top = (initY + dy)+'%';
             }
         }
 
         document.addEventListener('mouseup', () => {
             if(!dragId) return;
             if(isMoving) {
-                const seat = classrooms[activeRoomId].seats.find(s => s.id === dragId);
                 const el = document.getElementById('desk-'+dragId);
-                seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top);
-                db.collection("classrooms").doc(activeRoomId).update({ seats: classrooms[activeRoomId].seats });
+                const seat = classrooms[activeRoomId].seats.find(s => s.id === dragId);
+                seat.x = parseFloat(el.style.left); seat.y = parseFloat(el.style.top);
+                saveRoom();
             } else handleBooking(dragId);
             dragId = null;
         });
@@ -331,21 +398,57 @@
             const isAdmin = ['super_admin','admin','teacher'].includes(currentUser.role);
             if (seat.bookedBy) {
                 if (seat.bookedBy === currentUser.email || isAdmin) {
-                    Swal.fire({ title: 'ยกเลิกจอง?', icon: 'warning', showCancelButton: true, customClass:{popup:'glass-ui'} }).then(res => {
-                        if(res.isConfirmed) { seat.bookedBy = null; seat.name = null; db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats }); }
-                    });
+                    Swal.fire({ title: 'ยกเลิกการจอง?', icon: 'warning', showCancelButton: true, customClass:{popup:'glass-card'} })
+                    .then(r => { if(r.isConfirmed) { seat.bookedBy = null; seat.name = null; saveRoom(); }});
                 }
             } else {
                 if (!isAdmin && room.seats.some(s => s.bookedBy === currentUser.email)) return;
                 seat.bookedBy = currentUser.email; seat.name = currentUser.name;
-                db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
+                saveRoom();
             }
         }
 
-        function logout() { localStorage.clear(); location.reload(); }
+        // --- User Management (Revoke Role Feature) ---
+        async function showUserManagement() {
+            const snap = await db.collection("users").get();
+            let rows = '';
+            snap.forEach(doc => {
+                if (doc.id !== SUPER_ADMIN) {
+                    rows += `
+                    <div class="flex justify-between items-center bg-white/5 p-4 rounded-3xl mb-3 border border-white/5">
+                        <div class="text-left"><p class="text-sm font-bold">${doc.id}</p><p class="text-[9px] opacity-40 font-black uppercase tracking-widest">${doc.data().role}</p></div>
+                        <button onclick="removeUser('${doc.id}')" class="w-10 h-10 rounded-full bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all"><i class='bx bx-x'></i></button>
+                    </div>`;
+                }
+            });
+            Swal.fire({
+                title: 'จัดการสิทธิ์เข้าถึง',
+                html: `
+                    <div class="mb-6"><input id="swalEmail" placeholder="email @ntun.ac.th" class="w-full bg-white/10 rounded-2xl p-4 text-white mb-3 border-none shadow-inner"><select id="swalRole" class="w-full bg-indigo-900/50 rounded-2xl p-4 text-white border-none"><option value="teacher">Teacher (คุณครู)</option><option value="admin">Admin (แอดมิน)</option></select></div>
+                    <button id="addBtn" class="glass-pill w-full py-4 mb-6 bg-blue-600 border-none font-bold shadow-lg">เพิ่มผู้ดูแลระบบ</button>
+                    <div class="max-h-64 overflow-y-auto pr-2">${rows || '<p class="opacity-20 py-10">ไม่มีรายชื่อผู้ดูแล</p>'}</div>`,
+                showConfirmButton: false, showCancelButton: true, customClass:{popup:'glass-card'},
+                didOpen: () => {
+                    document.getElementById('addBtn').onclick = async () => {
+                        const email = document.getElementById('swalEmail').value.trim().toLowerCase();
+                        if(!email.endsWith('@ntun.ac.th')) return;
+                        await db.collection("users").doc(email).set({ role: document.getElementById('swalRole').value, name: "Pending User" });
+                        Swal.close(); showUserManagement();
+                    };
+                }
+            });
+        }
+
+        async function removeUser(email) {
+            await db.collection("users").doc(email).delete();
+            Swal.close(); showUserManagement();
+        }
+
+        function saveRoom() { db.collection("classrooms").doc(activeRoomId).update({ seats: classrooms[activeRoomId].seats }); }
         function openRoom(id) { activeRoomId = id; renderUI(); }
+        function logout() { localStorage.removeItem('ntun_art_v5'); location.reload(); }
         async function deleteRoom(id) {
-            Swal.fire({title:'ลบห้องนี้?', icon:'warning', showCancelButton:true, customClass:{popup:'glass-ui'}}).then(r => {
+            Swal.fire({title:'ลบห้องนี้?', icon:'warning', showCancelButton:true, customClass:{popup:'glass-card'}}).then(r => {
                 if(r.isConfirmed) db.collection("classrooms").doc(id).delete();
             });
         }
