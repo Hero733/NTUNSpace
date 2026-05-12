@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NTUN SPACE - V5 FULL REBUILD</title>
+    <title>NTUN SPACE - FINAL FIX</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,124 +15,88 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --glass: rgba(255, 255, 255, 0.25); --border: rgba(255, 255, 255, 0.4); }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         body { 
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(180deg, #87CEEB 0%, #7B68EE 50%, #FF69B4 100%);
-            background-attachment: fixed;
-            min-height: 100vh; color: white; overflow-x: hidden;
+            background-attachment: fixed; min-height: 100vh; color: white;
         }
-
-        /* Glassmorphism Elements */
-        .glass { background: var(--glass); backdrop-filter: blur(20px) saturate(160%); border: 1px solid var(--border); }
-        .glass-pill { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; }
+        .glass { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); }
+        .admin-theme { background: linear-gradient(180deg, #1e293b 0%, #334155 100%) !important; }
         
-        /* Progress Bar */
-        .pg-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
-        .pg-bar { height: 100%; background: #22c55e; transition: width 0.8s ease; box-shadow: 0 0 10px #22c55e; }
-
-        /* Desk & Chair Premium Design */
-        .desk { width: 70px; height: 85px; position: absolute; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-        .desk:hover { transform: scale(1.1) translateY(-5px); z-index: 10; }
-        .desk-top { fill: rgba(255,255,255,0.8); stroke: white; stroke-width: 1.5; rx: 8; }
-        .chair { fill: rgba(255,255,255,0.4); stroke: white; stroke-width: 1.2; }
-        
-        .is-booked .desk-top { fill: #818cf8; stroke: #c7d2fe; }
-        .is-me .desk-top { fill: #22c55e; stroke: #bbf7d0; filter: drop-shadow(0 0 8px #22c55e); }
+        /* เก้าอี้แบบพรีเมียม */
+        .desk { width: 70px; height: 85px; position: absolute; cursor: pointer; transition: 0.3s; }
+        .desk-top { fill: rgba(255,255,255,0.8); stroke: white; rx: 8; }
+        .chair { fill: rgba(255,255,255,0.4); stroke: white; }
+        .is-booked .desk-top { fill: #818cf8; }
+        .is-me .desk-top { fill: #22c55e; filter: drop-shadow(0 0 10px #22c55e); }
         .desk-num { position: absolute; top: 25px; width: 100%; text-align: center; font-size: 11px; font-weight: 800; color: #1e293b; pointer-events: none; }
-
-        .fade-up { animation: fadeUp 0.6s ease forwards; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+        
+        .pg-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+        .pg-bar { height: 100%; background: #22c55e; transition: width 0.8s ease; }
     </style>
 </head>
-<body>
+<body id="body-context">
 
-    <div id="view-login" class="fixed inset-0 z-[1000] flex items-center justify-center p-6">
-        <div class="glass p-12 w-full max-w-sm rounded-[3.5rem] text-center shadow-2xl fade-up">
-            <div class="w-24 h-24 mx-auto mb-8 bg-white rounded-full p-4 shadow-lg">
-                <img src="photo/logo.png" class="w-full h-full object-contain">
-            </div>
-            <h1 class="text-3xl font-bold mb-2">NTUN SPACE</h1>
-            <p class="text-white/70 text-xs mb-10 tracking-widest uppercase font-light">Online Classroom Registration</p>
-            
+    <div id="page-login" class="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-sky-400">
+        <div class="glass p-10 w-full max-w-sm rounded-[3rem] text-center shadow-2xl">
+            <img src="photo/logo.png" class="w-24 h-24 mx-auto mb-6 bg-white rounded-full p-3">
+            <h1 class="text-3xl font-bold mb-8">NTUN SPACE</h1>
             <div id="g_id_onload" 
                  data-client_id="118310489688-ksc64dv5rnv7o9jo2oklfeeibc2qk452.apps.googleusercontent.com" 
-                 data-callback="onGoogleSignIn"></div>
-            <div class="g_id_signin flex justify-center" data-type="standard" data-shape="pill" data-size="large"></div>
+                 data-callback="onSignIn"></div>
+            <div class="g_id_signin flex justify-center" data-type="standard"></div>
+            <button onclick="forceReset()" class="mt-8 text-[10px] opacity-50 underline">ล้างข้อมูลระบบ (กรณีเข้าไม่ได้)</button>
         </div>
     </div>
 
-    <div id="view-app" class="hidden">
-        <header class="p-6 md:p-10 flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
-                <div class="glass-pill p-2"><img src="photo/logo.png" class="w-10 h-10 object-contain"></div>
-                <div>
-                    <h2 class="text-xl font-bold leading-tight">NTUN SPACE</h2>
-                    <p class="text-[10px] opacity-60 tracking-tighter">PREMIUM SEATING SYSTEM</p>
-                </div>
+    <div id="page-app" class="hidden">
+        <header class="p-6 flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-3">
+                <img src="photo/logo.png" class="w-10 h-10 object-contain bg-white rounded-full p-1">
+                <h2 class="font-bold text-xl uppercase">NTUN SPACE</h2>
             </div>
-            
-            <div class="flex items-center gap-4">
-                <div class="glass-pill px-5 py-2.5 flex items-center gap-3">
-                    <img id="user-avatar" class="w-8 h-8 rounded-full border border-white/50 shadow-sm">
-                    <span id="user-display-name" class="text-xs font-bold tracking-wide"></span>
-                </div>
-                <button onclick="signOut()" class="bg-red-500/80 hover:bg-red-600 px-6 py-2.5 rounded-full text-xs font-bold transition-all shadow-lg">ออกระบบ</button>
+            <div class="flex items-center gap-3 bg-white/20 p-1 pr-4 rounded-full">
+                <img id="u-pic" class="w-8 h-8 rounded-full border border-white/50">
+                <span id="u-name" class="text-xs font-bold"></span>
+                <button onclick="signOut()" class="ml-2 text-red-300 font-bold text-[10px] uppercase">Logout</button>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-6 pb-24">
-            
-            <div id="ctx-student" class="hidden fade-up">
-                <h1 class="text-5xl font-bold mb-10 drop-shadow-xl">สวัสดี, <span id="greet-name"></span></h1>
-                
-                <div id="my-seat-card"></div>
-
-                <div id="join-room-form" class="glass p-10 rounded-[3rem] max-w-2xl mt-10">
-                    <label class="block text-xs font-bold uppercase tracking-widest opacity-60 mb-4">เข้าใช้งานห้องเรียน</label>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <input id="input-room-id" class="flex-1 glass bg-white/10 px-8 py-5 rounded-3xl text-2xl font-bold tracking-[0.3em] uppercase outline-none focus:ring-2 ring-white/50" placeholder="รหัสห้อง">
-                        <button onclick="joinRoom()" class="bg-white text-indigo-600 px-12 py-5 rounded-3xl font-black text-xl shadow-xl hover:scale-105 active:scale-95 transition-all">JOIN</button>
+        <main class="max-w-7xl mx-auto px-6 py-10">
+            <div id="ui-student" class="hidden">
+                <h1 class="text-5xl font-bold mb-10">สวัสดี, <span id="hi-name"></span></h1>
+                <div id="my-seat-status"></div>
+                <div id="box-join" class="glass p-8 rounded-[2.5rem] max-w-xl mt-6">
+                    <p class="mb-4 font-bold opacity-70">เข้าใช้งานห้องเรียน</p>
+                    <div class="flex gap-3">
+                        <input id="in-code" class="flex-1 bg-white/20 rounded-2xl p-4 text-xl font-bold outline-none" placeholder="ROOM ID">
+                        <button onclick="joinRoom()" class="bg-white text-indigo-600 px-8 rounded-2xl font-black">JOIN</button>
                     </div>
                 </div>
             </div>
 
-            <div id="ctx-admin" class="hidden fade-up">
-                <div class="flex justify-between items-end mb-10">
-                    <div>
-                        <h2 class="text-3xl font-black tracking-tight">คลังห้องเรียน</h2>
-                        <p class="text-xs opacity-70">จัดการข้อมูลห้องเรียนและที่นั่งทั้งหมด</p>
-                    </div>
-                    <button onclick="openCreateModal()" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-bold shadow-lg hover:bg-indigo-50 transition-all">+ สร้างห้อง</button>
-                </div>
-                <div id="admin-room-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            </div>
-
-            <div id="view-room-map" class="hidden mt-10 fade-up">
+            <div id="ui-admin" class="hidden">
                 <div class="flex justify-between items-center mb-8">
-                    <button onclick="exitRoom()" class="glass-pill px-6 py-2.5 font-bold text-sm"><i class='bx bx-left-arrow-alt'></i> กลับหน้าหลัก</button>
-                    <h2 id="current-room-name" class="text-3xl font-bold"></h2>
+                    <h2 class="text-3xl font-bold">แผงควบคุมแอดมิน</h2>
+                    <button onclick="addRoom()" class="bg-white text-slate-800 px-6 py-2 rounded-full font-bold shadow-lg">+ สร้างห้อง</button>
                 </div>
-                <div class="glass rounded-[4rem] p-6 md:p-12 overflow-auto border-white/20">
-                    <div id="map-container" class="w-[950px] h-[750px] mx-auto relative">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-3 bg-white/30 rounded-full blur-[1px]"></div>
-                        <p class="absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-30 tracking-[1em]">หน้าห้องเรียน</p>
-                        <div id="map-render"></div>
-                    </div>
-                </div>
+                <div id="admin-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
             </div>
 
+            <div id="ui-map" class="hidden mt-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="closeRoom()" class="bg-white/20 px-5 py-2 rounded-full font-bold text-sm">< กลับ</button>
+                    <h2 id="room-title" class="text-2xl font-bold"></h2>
+                </div>
+                <div class="glass rounded-[3rem] p-6 overflow-auto">
+                    <div id="map-render" class="w-[900px] h-[700px] mx-auto relative"></div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        // --- CONFIG & DATABASE ---
+        // FIREBASE SETUP
         const firebaseConfig = {
             apiKey: "AIzaSyAlaTyhtXf-d6qDSD5AeWR33Hg3VCn55o8",
             authDomain: "ntunspace.firebaseapp.com",
@@ -144,208 +108,157 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const ADMIN_EMAIL = "ntun21933@ntun.ac.th".toLowerCase();
-        let user = null;
-        let classrooms = {};
-        let activeRoom = null;
+        // ** ADMIN EMAIL CONFIG **
+        const THE_ADMIN = "ntun21933@ntun.ac.th";
+        let me = null;
+        let rooms = {};
+        let activeId = null;
 
-        // --- AUTH LOGIC ---
-        function onGoogleSignIn(response) {
+        // 1. LOGIN FUNCTION
+        function onSignIn(response) {
             const data = JSON.parse(atob(response.credential.split('.')[1]));
-            const email = data.email.toLowerCase();
+            const email = data.email.toLowerCase().trim();
 
             if(!email.endsWith('@ntun.ac.th')) {
                 Swal.fire('Error', 'ต้องใช้ @ntun.ac.th เท่านั้น', 'error');
                 return;
             }
 
-            user = {
-                email: email,
-                name: email.split('@')[0], // ดึงชื่อหน้า @
-                pic: data.picture,
-                role: (email === ADMIN_EMAIL) ? 'admin' : 'student'
-            };
+            // ตัดสิน Role ทันทีที่บรรทัดนี้
+            const role = (email === THE_ADMIN.toLowerCase().trim()) ? 'admin' : 'student';
 
-            console.log("Login Success as:", user.role); // Debug
-            localStorage.setItem('ntun_v5_session', JSON.stringify(user));
-            initApp();
+            me = { email, name: email.split('@')[0], pic: data.picture, role: role };
+            
+            localStorage.setItem('ntun_user', JSON.stringify(me));
+            
+            // แจ้งเตือนเพื่อให้รู้ว่าระบบเห็นเราเป็นใคร (Debug)
+            Swal.fire({
+                title: 'เข้าสู่ระบบสำเร็จ',
+                text: `คุณเข้าระบบในฐานะ: ${role.toUpperCase()}`,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                location.reload(); // รีโหลดเพื่อล้าง State
+            });
         }
 
-        function initApp() {
-            const saved = localStorage.getItem('ntun_v5_session');
+        // 2. INITIALIZE APP
+        function startApp() {
+            const saved = localStorage.getItem('ntun_user');
             if(!saved) return;
-            user = JSON.parse(saved);
+            me = JSON.parse(saved);
 
-            // UI Switch
-            document.getElementById('view-login').style.display = 'none';
-            document.getElementById('view-app').classList.remove('hidden');
-            
-            document.getElementById('user-avatar').src = user.pic;
-            document.getElementById('user-display-name').innerText = user.name;
-            document.getElementById('greet-name').innerText = user.name;
+            document.getElementById('page-login').style.display = 'none';
+            document.getElementById('page-app').classList.remove('hidden');
+            document.getElementById('u-pic').src = me.pic;
+            document.getElementById('u-name').innerText = me.name;
+            document.getElementById('hi-name').innerText = me.name;
 
-            if(user.role === 'admin') {
-                document.getElementById('ctx-admin').classList.remove('hidden');
-                document.getElementById('ctx-student').classList.add('hidden');
+            if(me.role === 'admin') {
+                document.getElementById('body-context').classList.add('admin-theme');
+                document.getElementById('ui-admin').classList.remove('hidden');
             } else {
-                document.getElementById('ctx-admin').classList.add('hidden');
-                document.getElementById('ctx-student').classList.remove('hidden');
+                document.getElementById('ui-student').classList.remove('hidden');
             }
 
-            // Realtime Sync
             db.collection("classrooms").onSnapshot(snap => {
-                classrooms = {};
-                snap.forEach(doc => { classrooms[doc.id] = doc.data(); });
+                rooms = {};
+                snap.forEach(doc => { rooms[doc.id] = doc.data(); });
                 render();
             });
         }
 
-        function signOut() {
-            localStorage.removeItem('ntun_v5_session');
-            location.reload();
-        }
-
-        // --- RENDER LOGIC ---
+        // 3. RENDER UI
         function render() {
-            if(activeRoom) {
-                renderMap();
-            } else if(user.role === 'admin') {
-                renderAdminGrid();
+            if(activeId) {
+                const room = rooms[activeId];
+                document.getElementById('room-title').innerText = room.name;
+                document.getElementById('map-render').innerHTML = room.seats.map(s => {
+                    const isMe = s.bookedBy === me.email;
+                    const state = isMe ? 'is-me' : (s.bookedBy ? 'is-booked' : '');
+                    return `
+                    <div class="desk ${state}" style="left:${s.x}px; top:${s.y}px;" onclick="bookSeat('${s.id}')">
+                        <svg viewBox="0 0 100 120"><path d="M25,85 L75,85 L70,115 L30,115 Z" class="chair"/><rect x="5" y="10" width="90" height="65" class="desk-top"/></svg>
+                        <div class="desk-num">${isMe ? 'ME' : (s.bookedBy ? 'FULL' : s.id)}</div>
+                    </div>`;
+                }).join('');
+            } else if(me.role === 'admin') {
+                document.getElementById('admin-grid').innerHTML = Object.entries(rooms).map(([id, r]) => {
+                    const booked = r.seats.filter(s => s.bookedBy).length;
+                    const percent = (booked / r.seats.length) * 100;
+                    return `
+                    <div class="glass p-6 rounded-[2rem] cursor-pointer" onclick="openRoom('${id}')">
+                        <div class="flex justify-between mb-4"><span class="text-xs font-bold opacity-50">${id}</span><i class='bx bx-trash' onclick="event.stopPropagation(); delRoom('${id}')"></i></div>
+                        <h3 class="text-xl font-bold">${r.name}</h3>
+                        <p class="text-xs mt-2 mb-2">จองแล้ว ${booked}/${r.seats.length}</p>
+                        <div class="pg-bg"><div class="pg-bar" style="width:${percent}%"></div></div>
+                    </div>`;
+                }).join('');
             } else {
-                renderStudentStatus();
-            }
-        }
-
-        function renderAdminGrid() {
-            const grid = document.getElementById('admin-room-grid');
-            grid.innerHTML = Object.entries(classrooms).map(([id, room]) => {
-                const booked = room.seats.filter(s => s.bookedBy).length;
-                const total = room.seats.length;
-                const progress = (booked / total) * 100;
-                return `
-                <div class="glass p-8 rounded-[3rem] cursor-pointer hover:bg-white/30 transition-all animate-in" onclick="enterRoom('${id}')">
-                    <div class="flex justify-between items-start mb-6">
-                        <span class="glass-pill px-3 py-1 text-[10px] font-bold">${id}</span>
-                        <button onclick="event.stopPropagation(); deleteRoom('${id}')" class="text-white/30 hover:text-red-400"><i class='bx bx-trash text-xl'></i></button>
-                    </div>
-                    <h3 class="text-2xl font-bold">${room.name}</h3>
-                    <p class="text-sm opacity-70 mt-2 font-medium">จองแล้ว: ${booked} / ${total}</p>
-                    <div class="pg-bg"><div class="pg-bar" style="width: ${progress}%"></div></div>
-                </div>`;
-            }).join('');
-        }
-
-        function renderStudentStatus() {
-            const container = document.getElementById('my-seat-card');
-            const myRoomId = Object.keys(classrooms).find(id => classrooms[id].seats.some(s => s.bookedBy === user.email));
-            
-            if(myRoomId) {
-                const room = classrooms[myRoomId];
-                const seat = room.seats.find(s => s.bookedBy === user.email);
-                container.innerHTML = `
-                <div class="glass p-10 rounded-[3.5rem] max-w-xl shadow-2xl border-white/50">
-                    <span class="bg-green-500 text-[10px] font-bold px-4 py-1 rounded-full uppercase">ลงทะเบียนเรียบร้อย</span>
-                    <h2 class="text-4xl font-bold mt-6">${room.name}</h2>
-                    <p class="text-lg opacity-80 mt-2">ที่นั่งของคุณคือหมายเลข: <span class="text-4xl font-black text-indigo-100 underline">${seat.id}</span></p>
-                    <button onclick="enterRoom('${myRoomId}')" class="w-full mt-10 bg-white text-indigo-600 py-5 rounded-3xl font-bold shadow-xl hover:scale-[1.02] transition-all">ดูตำแหน่งที่นั่ง</button>
-                </div>`;
-                document.getElementById('join-room-form').classList.add('hidden');
-            } else {
-                container.innerHTML = "";
-                document.getElementById('join-room-form').classList.remove('hidden');
-            }
-        }
-
-        function renderMap() {
-            const room = classrooms[activeRoom];
-            document.getElementById('current-room-name').innerText = room.name;
-            const container = document.getElementById('map-render');
-            container.innerHTML = room.seats.map(s => {
-                const isMe = s.bookedBy === user.email;
-                const state = isMe ? 'is-me' : (s.bookedBy ? 'is-booked' : '');
-                return `
-                <div class="desk ${state}" style="left:${s.x}px; top:${s.y}px;" onclick="handleSeatClick('${s.id}')">
-                    <svg viewBox="0 0 100 120">
-                        <path d="M25,85 L75,85 L70,115 L30,115 Z" class="chair" />
-                        <rect x="5" y="10" width="90" height="65" class="desk-top" />
-                    </svg>
-                    <div class="desk-num">${isMe ? 'ME' : (s.bookedBy ? 'FULL' : s.id)}</div>
-                </div>`;
-            }).join('');
-        }
-
-        // --- ACTIONS ---
-        function enterRoom(id) {
-            activeRoom = id;
-            document.getElementById('ctx-student').classList.add('hidden');
-            document.getElementById('ctx-admin').classList.add('hidden');
-            document.getElementById('view-room-map').classList.remove('hidden');
-            render();
-        }
-
-        function exitRoom() {
-            activeRoom = null;
-            document.getElementById('view-room-map').classList.add('hidden');
-            initApp(); // รีเซ็ตหน้าจอตาม Role
-        }
-
-        async function joinRoom() {
-            const id = document.getElementById('input-room-id').value.trim().toUpperCase();
-            if(classrooms[id]) enterRoom(id);
-            else Swal.fire('ไม่พบห้องเรียน', 'โปรดตรวจสอบรหัสอีกครั้ง', 'warning');
-        }
-
-        async function handleSeatClick(sid) {
-            const room = classrooms[activeRoom];
-            const seat = room.seats.find(s => s.id === sid);
-
-            if(seat.bookedBy) {
-                if(seat.bookedBy === user.email || user.role === 'admin') {
-                    const res = await Swal.fire({ title: 'ยกเลิกการจอง?', showCancelButton: true });
-                    if(res.isConfirmed) {
-                        seat.bookedBy = null;
-                        db.collection("classrooms").doc(activeRoom).update({ seats: room.seats });
-                    }
+                const myRoom = Object.keys(rooms).find(id => rooms[id].seats.some(s => s.bookedBy === me.email));
+                const statusBox = document.getElementById('my-seat-status');
+                if(myRoom) {
+                    const s = rooms[myRoom].seats.find(x => x.bookedBy === me.email);
+                    statusBox.innerHTML = `
+                    <div class="glass p-8 rounded-[2.5rem] max-w-xl">
+                        <h2 class="text-3xl font-bold">${rooms[myRoom].name}</h2>
+                        <p class="text-xl mt-2">เลขที่นั่ง: <span class="text-3xl font-bold underline">${s.id}</span></p>
+                        <button onclick="openRoom('${myRoom}')" class="w-full mt-6 bg-white text-indigo-600 py-4 rounded-2xl font-bold">ดูผังที่นั่ง</button>
+                    </div>`;
+                    document.getElementById('box-join').classList.add('hidden');
                 } else {
-                    Swal.fire('ที่นั่งนี้มีคนจองแล้ว', '', 'info');
+                    statusBox.innerHTML = "";
+                    document.getElementById('box-join').classList.remove('hidden');
+                }
+            }
+        }
+
+        // 4. ACTIONS
+        function openRoom(id) { 
+            activeId = id; 
+            document.getElementById('ui-student').classList.add('hidden');
+            document.getElementById('ui-admin').classList.add('hidden');
+            document.getElementById('ui-map').classList.remove('hidden');
+            render(); 
+        }
+        function closeRoom() { activeId = null; document.getElementById('ui-map').classList.add('hidden'); startApp(); }
+        function joinRoom() { 
+            const id = document.getElementById('in-code').value.toUpperCase();
+            if(rooms[id]) openRoom(id); else Swal.fire('ไม่พบห้อง', '', 'error');
+        }
+        async function bookSeat(sid) {
+            const room = rooms[activeId];
+            const seat = room.seats.find(x => x.id === sid);
+            if(seat.bookedBy) {
+                if(seat.bookedBy === me.email || me.role === 'admin') {
+                    const res = await Swal.fire({ title: 'ยกเลิกการจอง?', showCancelButton: true });
+                    if(res.isConfirmed) { seat.bookedBy = null; db.collection("classrooms").doc(activeId).update({seats: room.seats}); }
                 }
                 return;
             }
-
-            if(user.role !== 'admin' && room.seats.some(s => s.bookedBy === user.email)) {
-                Swal.fire('คุณจองที่นั่งไปแล้ว', '', 'error');
-                return;
-            }
-
-            seat.bookedBy = user.email;
-            db.collection("classrooms").doc(activeRoom).update({ seats: room.seats });
+            if(me.role !== 'admin' && room.seats.some(x => x.bookedBy === me.email)) return Swal.fire('จองซ้ำไม่ได้', '', 'error');
+            seat.bookedBy = me.email;
+            db.collection("classrooms").doc(activeId).update({seats: room.seats});
         }
-
-        function openCreateModal() {
+        function addRoom() {
             Swal.fire({
-                title: 'สร้างห้องเรียนใหม่',
-                html: `<input id="sw-name" class="swal2-input" placeholder="ชื่อห้องเรียน (เช่น 6/1)">
-                       <input id="sw-count" type="number" class="swal2-input" placeholder="จำนวนที่นั่ง">`,
-                preConfirm: () => [document.getElementById('sw-name').value, document.getElementById('sw-count').value]
-            }).then(res => {
-                if(!res.value || !res.value[0]) return;
-                const [name, count] = res.value;
+                title: 'สร้างห้องใหม่',
+                html: `<input id="sw-n" class="swal2-input" placeholder="ชื่อห้อง"><input id="sw-c" type="number" class="swal2-input" placeholder="จำนวนที่นั่ง">`,
+                preConfirm: () => [document.getElementById('sw-n').value, document.getElementById('sw-c').value]
+            }).then(r => {
+                if(!r.value) return;
                 const id = Math.random().toString(36).substring(2, 7).toUpperCase();
                 const seats = [];
-                for(let i=0; i<count; i++) {
-                    const col = i % 8; const row = Math.floor(i / 8);
-                    seats.push({ id: i+1, x: (col * 110) + 50, y: (row * 130) + 100, bookedBy: null });
-                }
-                db.collection("classrooms").doc(id).set({ name, seats });
+                for(let i=0; i<r.value[1]; i++) seats.push({ id: i+1, x: (i%8)*110+50, y: Math.floor(i/8)*130+80, bookedBy: null });
+                db.collection("classrooms").doc(id).set({ name: r.value[0], seats });
             });
         }
+        function delRoom(id) { db.collection("classrooms").doc(id).delete(); }
+        function signOut() { localStorage.clear(); location.reload(); }
+        function forceReset() { localStorage.clear(); alert("ล้างข้อมูลแล้ว โปรดลองเข้าสู่ระบบใหม่"); location.reload(); }
 
-        async function deleteRoom(id) {
-            const res = await Swal.fire({ title: 'ลบห้องเรียน?', text: 'ข้อมูลทั้งหมดจะถูกลบถาวร', icon: 'warning', showCancelButton: true });
-            if(res.isConfirmed) db.collection("classrooms").doc(id).delete();
-        }
-
-        window.onload = initApp;
+        window.onload = startApp;
     </script>
 </body>
 </html>
