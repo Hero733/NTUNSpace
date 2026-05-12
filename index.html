@@ -332,21 +332,53 @@
         }
 
         async function handleBooking(sid) {
-            const room = classrooms[activeRoomId]; const seat = room.seats.find(s => s.id === sid);
+            const room = classrooms[activeRoomId]; 
+            const seat = room.seats.find(s => s.id === sid);
             const isStaff = ['super_admin', 'admin', 'teacher'].includes(currentUser.role);
+
+            // หากที่นั่งมีคนจองแล้ว
             if (seat.bookedBy) {
                 if (seat.bookedBy === currentUser.email || isStaff) {
                     const res = await Swal.fire({ 
                         title: 'ยกเลิกการจอง?', text: `ที่นั่งหมายเลข ${sid} (${seat.name})`, icon: 'question', 
                         showCancelButton: true, confirmButtonColor: '#ef4444', background: '#1e293b', color: '#fff'
                     });
-                    if(res.isConfirmed) { seat.bookedBy = null; seat.name = null; db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats }); }
+                    if(res.isConfirmed) { 
+                        seat.bookedBy = null; 
+                        seat.name = null; 
+                        db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats }); 
+                    }
                 }
-            } else {
-                if (!isStaff && room.seats.some(s => s.bookedBy === currentUser.email)) return Swal.fire('จองแล้ว', 'คุณมีที่นั่งในห้องนี้แล้ว', 'warning');
-                seat.bookedBy = currentUser.email; seat.name = currentUser.name;
-                db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
+                return;
             }
+
+            // --- ระบบป้องกันการเกรียน (Global Booking Lock) ---
+            if (!isStaff) {
+                let existingBooking = null;
+                // วนลูปหาในทุกห้องเรียนที่มีในระบบ
+                for (const rId in classrooms) {
+                    const found = classrooms[rId].seats.find(s => s.bookedBy === currentUser.email);
+                    if (found) {
+                        existingBooking = { roomName: classrooms[rId].name, seatId: found.id };
+                        break;
+                    }
+                }
+
+                if (existingBooking) {
+                    return Swal.fire({
+                        icon: 'error',
+                        title: 'จองซ้ำซ้อนไม่ได้',
+                        text: `คุณได้จองที่นั่งเลขที่ ${existingBooking.seatId} ในห้อง "${existingBooking.roomName}" ไว้แล้ว กรุณายกเลิกที่เดิมก่อน`,
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                }
+            }
+
+            // ดำเนินการจอง
+            seat.bookedBy = currentUser.email; 
+            seat.name = currentUser.name;
+            db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
         }
 
         function showCreateModal() {
