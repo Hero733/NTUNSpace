@@ -248,12 +248,10 @@
             try { return JSON.parse(decodeURIComponent(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))); } catch (e) { return null; }
         }
 
-        // แก้ไขระบบ Login ให้รับทุกอีเมล
+        // ลบระบบตรวจสอบโดเมนออก รองรับทุกบัญชี
         async function handleGoogleLogin(response) {
             const payload = decodeJwt(response.credential);
             const email = payload.email.toLowerCase();
-            
-            // ลบเงื่อนไขที่เช็คโดเมนออกไปแล้ว
             
             currentUser = { email, name: payload.name, role: 'student', picture: payload.picture }; 
             localStorage.setItem('ntun_session_v15', JSON.stringify(currentUser));
@@ -317,7 +315,6 @@
 
         function logout() { localStorage.removeItem('ntun_session_v15'); location.reload(); }
 
-        // --- ระบบคัดลอกรหัสเข้าห้อง ---
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 const Toast = Swal.mixin({
@@ -388,7 +385,6 @@
             Swal.fire({ title: 'ยกเลิกเวลาสำเร็จ', text: 'ระบบเปิดให้จองตลอดเวลาแล้ว', icon: 'success', timer: 1500, showConfirmButton: false, background: 'rgba(255,255,255,0.95)' });
         }
 
-        // แก้ไขให้เพิ่มครูได้ทุกอีเมล
         async function addTeacher() {
             const email = document.getElementById('newTeacherEmail').value.trim().toLowerCase();
             if(!email) return Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'กรุณากรอกอีเมล', background: 'rgba(255,255,255,0.95)' });
