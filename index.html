@@ -13,6 +13,7 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -26,6 +27,7 @@
             overflow-x: hidden;
             background: linear-gradient(180deg, #5AB2FF 0%, #8390FA 50%, #F5A9CE 100%) !important;
             background-attachment: fixed !important;
+            scroll-behavior: smooth;
         }
 
         .stars-bg {
@@ -33,7 +35,13 @@
             background-image: 
                 radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
                 radial-gradient(1px 1px at 80px 70px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 150px 160px, #ffffff, rgba(0,0,0,0));
+                radial-gradient(2px 2px at 150px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 290px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 330px 180px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 460px 120px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 10vw 80vh, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 80vw 20vh, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 60vw 60vh, #ffffff, rgba(0,0,0,0));
             background-repeat: repeat; background-size: 500px 500px;
             opacity: 0.8; z-index: 0; pointer-events: none;
             animation: drift 150s linear infinite;
@@ -45,18 +53,58 @@
             border: 1px solid var(--glass-border); box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.15);
         }
 
+        /* ดีไซน์โต๊ะเรียน */
+        .desk { 
+            width: 70px; height: 85px; position: absolute; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            cursor: pointer; touch-action: none; z-index: 20;
+        }
+        .desk:hover:not(.dragging) { transform: translateY(-5px) scale(1.05); z-index: 30; }
+        .desk.dragging { transition: none !important; z-index: 50; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3)); transform: scale(1.1); }
+
+        .desk-chair { fill: rgba(255, 255, 255, 0.3); stroke: rgba(255, 255, 255, 0.6); stroke-width: 1.5; rx: 8; transition: all 0.3s; }
+        .desk-top { fill: rgba(255, 255, 255, 0.5); stroke: rgba(255, 255, 255, 0.9); stroke-width: 1.5; rx: 6; transition: all 0.3s; }
+        .desk-line { stroke: rgba(255, 255, 255, 0.7); stroke-width: 1.5; stroke-linecap: round; }
+
+        .booked .desk-chair { fill: rgba(239, 68, 68, 0.6); stroke: #ef4444; }
+        .booked .desk-top { fill: rgba(248, 113, 113, 0.8); stroke: #fee2e2; }
+        .booked:hover:not(.dragging) { transform: none; cursor: not-allowed; }
+
+        .my-seat .desk-chair { fill: rgba(34, 197, 94, 0.6); stroke: #22c55e; }
+        .my-seat .desk-top { fill: rgba(74, 222, 128, 0.9); stroke: #ffffff; filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.8)); }
+        
+        .desk-label { position: absolute; top: 38px; width: 100%; text-align: center; font-size: 14px; font-weight: 800; color: #1e293b; pointer-events: none; text-shadow: 0px 0px 4px rgba(255,255,255,0.8); }
+
+        .desk-tooltip {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-10px);
+            background: rgba(0,0,0,0.8); color: white; padding: 6px 12px; font-size: 12px;
+            white-space: nowrap; border-radius: 8px; opacity: 0; pointer-events: none; transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px);
+        }
+        .desk:hover:not(.dragging) .desk-tooltip { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+
+        .map-area { border-radius: 2rem; background: rgba(0, 0, 0, 0.15); box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.1); position: relative; overflow: auto; display: flex; justify-content: center; }
+        #roomCanvas { position: relative; width: 1000px; height: 800px; transform-origin: top center; transition: transform 0.3s ease; }
+
+        @media (max-width: 600px) { #roomCanvas { zoom: 0.55; } .map-area { justify-content: flex-start; } }
+        @media (min-width: 601px) and (max-width: 1024px) { #roomCanvas { zoom: 0.8; } }
+
         .animate-in { animation: fadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
         #g_id_onload, .g_id_signin { background-color: white; border-radius: 999px; }
 
+        /* นาฬิกานับถอยหลัง Global */
         .countdown-box { display: flex; gap: 12px; align-items: center; justify-content: center; }
         .time-block { 
             background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 8px 16px; border-radius: 16px; min-width: 65px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); backdrop-filter: blur(10px);
         }
-        .time-val { font-size: 24px; font-weight: 800; color: #fff; }
-        .time-lbl { font-size: 10px; color: rgba(255,255,255,0.7); }
+        .time-val { font-size: 24px; font-weight: 800; line-height: 1; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .time-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+        .time-colon { font-size: 24px; font-weight: 800; color: rgba(255,255,255,0.5); animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .expired-text { font-size: 24px; font-weight: 800; color: #fca5a5; text-shadow: 0 0 15px rgba(239,68,68,0.8); letter-spacing: 2px; text-align: center; }
     </style>
 </head>
 <body>
@@ -66,52 +114,111 @@
     <div id="loginPage" class="relative z-10 flex min-h-screen items-center justify-center p-4">
         <div class="glass-panel p-6 md:p-10 w-full max-w-sm md:max-w-md text-center rounded-[2.5rem] animate-in mx-auto">
             <div class="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 relative hover:scale-105 transition-transform">
-                <img src="https://cdn-icons-png.flaticon.com/512/3256/3256114.png" alt="Logo" class="relative z-10 w-full h-full object-contain drop-shadow-xl">
+                <img src="photo/logo.png" alt="Logo" class="relative z-10 w-full h-full object-contain drop-shadow-xl">
             </div>
             <h1 class="text-3xl md:text-4xl font-black mb-1 tracking-tight text-white uppercase drop-shadow-md">NTUN SPACE</h1>
             <p class="text-white/90 mb-8 font-light text-sm">ระบบจองที่นั่ง : Online</p>
             
-            <div class="bg-white rounded-full p-1.5 w-max max-w-[95%] overflow-hidden mx-auto mb-4 shadow-xl flex justify-center items-center">
-                <div id="g_id_onload" data-client_id="802485672001-7tuhmifm1ph2mb09hle6r6hf0tahu9gv.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
-                <div class="g_id_signin flex justify-center w-full" data-type="standard" data-shape="pill" data-theme="outline" data-size="large"></div>
+            <div class="bg-white rounded-full p-1.5 w-max max-w-[95%] overflow-hidden mx-auto mb-4 shadow-xl hover:shadow-2xl transition-all flex justify-center items-center">
+                <div id="g_id_onload" data-client_id="118310489688-8o6l3ogkihci3des8aab8qdd83a7r6gg.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
+                <div class="g_id_signin flex justify-center w-full scale-90 md:scale-100 origin-center" data-type="standard" data-shape="pill" data-theme="outline" data-size="large"></div>
             </div>
             <p class="mt-6 text-[10px] md:text-[11px] opacity-80 font-medium tracking-wide text-white uppercase">รองรับบัญชี Google ทุกบัญชี</p>
         </div>
     </div>
 
     <div id="mainApp" class="hidden min-h-screen flex flex-col relative z-10">
-        <header class="p-4 md:p-6 flex justify-between items-center max-w-7xl mx-auto w-full animate-in">
+        <header class="p-4 md:p-6 flex flex-col sm:flex-row justify-between items-center gap-4 max-w-7xl mx-auto w-full animate-in">
             <div class="glass-panel px-5 py-2 flex items-center gap-4 rounded-full">
-                <div class="text-left"><h1 class="text-white font-bold text-base uppercase tracking-widest">NTUN SPACE</h1></div>
+                <div class="w-10 h-10 flex items-center justify-center">
+                    <img src="photo/logo.png" class="w-full h-full object-contain drop-shadow-md">
+                </div>
+                <div class="text-left"><h1 class="text-white font-bold text-sm md:text-base leading-tight uppercase tracking-widest drop-shadow-sm">NTUN SPACE</h1><p class="text-white/80 text-[10px] md:text-xs">ระบบจองที่นั่ง : Online</p></div>
             </div>
             <div class="glass-panel p-1.5 flex items-center gap-2 rounded-full">
-                <button onclick="changePage('home')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium"><i class='bx bx-home-alt text-lg'></i></button>
-                <button id="btnSettings" onclick="changePage('settings')" class="hidden bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium"><i class='bx bx-cog text-lg'></i></button>
-                <div class="flex items-center gap-2 px-3 border-l border-white/30"><img id="userImg" src="" class="w-8 h-8 rounded-full border-2 border-white/80"><span id="userName" class="text-white text-sm font-medium hidden md:block"></span></div>
-                <button onclick="logout()" class="bg-red-500/80 hover:bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium"><i class='bx bx-log-out text-lg'></i></button>
+                <button onclick="changePage('home')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all"><i class='bx bx-home-alt text-lg'></i> <span class="hidden md:inline">หน้าแรก</span></button>
+                <button id="btnSettings" onclick="changePage('settings')" class="hidden bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all"><i class='bx bx-cog text-lg'></i> <span class="hidden md:inline">ตั้งค่าระบบ</span></button>
+                <div class="flex items-center gap-2 px-3 border-l border-white/30"><img id="userImg" src="" class="w-8 h-8 rounded-full border-2 border-white/80 shadow-sm"><span id="userName" class="text-white text-sm font-medium hidden md:block drop-shadow-sm"></span></div>
+                <button onclick="logout()" class="bg-red-500/80 hover:bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all shadow-sm"><i class='bx bx-log-out text-lg'></i></button>
             </div>
         </header>
 
-        <main class="flex-grow max-w-7xl mx-auto w-full px-4 md:px-6 pb-20">
-            <div id="viewHome">
-                <section class="mt-4 mb-8 animate-in">
-                    <p class="text-white/90 mb-1 font-light tracking-wide">ยินดีต้อนรับกลับมา</p>
-                    <h2 class="text-3xl md:text-5xl font-bold mb-6 text-white">สวัสดี, <span id="welcomeName">นักเรียน</span> <span id="roleBadge" class="hidden text-sm align-middle bg-[#5AB2FF] px-3 py-1 rounded-full ml-2 border border-white/50"></span></h2>
-                </section>
-                <div id="contentArea" class="glass-panel p-6 rounded-3xl"></div>
-            </div>
-
-            <div id="viewSettings" class="hidden animate-in glass-panel p-8 rounded-[2.5rem]">
-                <h2 class="text-3xl font-bold text-white mb-6">ตั้งค่าระบบ (Admin)</h2>
-                <div class="bg-black/20 p-6 rounded-3xl mb-6">
-                    <h3 class="text-xl font-bold mb-4">จัดการสิทธิ์ "ครู"</h3>
-                    <div class="flex gap-2 mb-4">
-                        <input type="email" id="newTeacherEmail" placeholder="ใส่อีเมล Google..." class="flex-1 bg-white/10 rounded-xl px-4 py-3 outline-none text-white">
-                        <button onclick="addTeacher()" class="bg-white text-[#5AB2FF] px-6 rounded-xl font-bold">เพิ่ม</button>
-                    </div>
-                    <div class="bg-black/30 rounded-2xl p-4 h-48 overflow-y-auto" id="teacherListContainer"></div>
+        <div id="globalTimerBanner" class="hidden max-w-7xl mx-auto w-full px-4 md:px-6 mb-4 animate-in">
+            <div class="glass-panel p-6 rounded-[2rem] flex flex-col items-center justify-center shadow-lg border-2 border-white/40">
+                <p class="text-sm md:text-base uppercase tracking-widest text-white mb-4 font-bold flex items-center gap-2"><i class='bx bx-time-five text-xl'></i> นับถอยหลังเวลาปิดจองทั้งระบบ</p>
+                <div id="globalCountdownContainer" class="countdown-box">
+                    <div class="time-block"><div id="gt-d" class="time-val">00</div><div class="time-lbl">วัน</div></div> <span class="time-colon">:</span>
+                    <div class="time-block"><div id="gt-h" class="time-val">00</div><div class="time-lbl">ชม.</div></div> <span class="time-colon">:</span>
+                    <div class="time-block"><div id="gt-m" class="time-val">00</div><div class="time-lbl">นาที</div></div> <span class="time-colon">:</span>
+                    <div class="time-block"><div id="gt-s" class="time-val">00</div><div class="time-lbl">วินาที</div></div>
                 </div>
             </div>
+        </div>
+
+        <main class="flex-grow max-w-7xl mx-auto w-full px-4 md:px-6 pb-20">
+            <div id="viewHome">
+                <section id="welcomeSection" class="mt-4 mb-8 text-left animate-in" style="animation-delay: 0.1s;">
+                    <p class="text-white/90 mb-1 font-light tracking-wide">ยินดีต้อนรับกลับมา</p>
+                    <h2 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-white drop-shadow-lg">สวัสดี, <span id="welcomeName">นักเรียน</span> <span id="roleBadge" class="hidden text-sm align-middle bg-[#5AB2FF] text-white px-3 py-1 rounded-full shadow-md ml-2 border border-white/50"></span></h2>
+                    <div id="dashboardStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
+                </section>
+
+                <section id="staffAction" class="hidden mb-8 animate-in">
+                    <div class="flex flex-col md:flex-row gap-4 items-center justify-between glass-panel p-4 md:p-5 rounded-[2rem]">
+                        <div class="relative flex-1 w-full">
+                            <i class='bx bx-search absolute left-5 top-1/2 -translate-y-1/2 text-white/80 text-lg'></i>
+                            <input type="text" id="roomSearch" oninput="renderDashboard()" class="w-full bg-black/20 border border-white/30 rounded-full py-3.5 pl-14 pr-6 outline-none text-white placeholder:text-white/70 focus:bg-black/30 transition-all shadow-inner" placeholder="ค้นหาชื่อห้อง หรือ ID...">
+                        </div>
+                        <button onclick="showCreateModal()" class="bg-white hover:bg-gray-100 text-[#5AB2FF] px-8 py-3.5 w-full md:w-auto rounded-full font-bold transition-all shadow-xl flex items-center justify-center gap-2">
+                            <i class='bx bx-plus-circle text-xl'></i> สร้างห้องเรียนใหม่
+                        </button>
+                    </div>
+                </section>
+
+                <div id="contentArea"></div>
+            </div>
+
+            <div id="viewSettings" class="hidden animate-in">
+                <div class="glass-panel p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative">
+                    <div class="flex items-center gap-4 mb-8 border-b border-white/20 pb-6">
+                        <i class='bx bx-cog text-4xl text-white'></i>
+                        <div>
+                            <h2 class="text-3xl font-bold text-white drop-shadow-md">ตั้งค่าระบบ (Admin)</h2>
+                            <p class="text-white/70 text-sm mt-1">จัดการระบบเวลาและสิทธิ์ผู้ใช้งาน</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-black/20 p-6 rounded-3xl border border-white/10 shadow-inner">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class='bx bx-time'></i> ตั้งเวลาปิดจองทั้งเว็บ</h3>
+                            <p class="text-sm text-white/80 mb-6">หากเวลาหมดลง นักเรียนจะไม่สามารถทำการจองที่นั่งหรือสุ่มที่นั่งได้ในทุกห้องเรียน</p>
+                            
+                            <div class="flex flex-col gap-3">
+                                <button onclick="setGlobalDeadlineUI()" class="bg-[#5AB2FF] hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all flex justify-center items-center gap-2">
+                                    <i class='bx bx-calendar-edit text-lg'></i> ตั้งเวลา / แก้ไขเวลา
+                                </button>
+                                <button onclick="clearGlobalDeadline()" class="bg-red-500/20 hover:bg-red-500/40 border border-red-400/50 text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all flex justify-center items-center gap-2">
+                                    <i class='bx bx-trash text-lg'></i> ยกเลิกเวลา (เปิดจองตลอด)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-black/20 p-6 rounded-3xl border border-white/10 shadow-inner">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class='bx bxs-user-badge'></i> จัดการสิทธิ์ "ครู"</h3>
+                            <p class="text-sm text-white/80 mb-6">ครูสามารถสร้างห้องเรียน กำหนดจำนวนที่นั่ง และขยับจัดผังโต๊ะได้</p>
+                            
+                            <div class="flex gap-2 mb-6">
+                                <input type="email" id="newTeacherEmail" placeholder="ใส่อีเมลที่ต้องการให้สิทธิ์..." class="flex-1 bg-white/10 border border-white/30 rounded-xl px-4 py-3 outline-none text-white placeholder:text-white/50 focus:bg-white/20 transition-all">
+                                <button onclick="addTeacher()" class="bg-white text-[#5AB2FF] px-6 py-3 rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-md">เพิ่ม</button>
+                            </div>
+
+                            <div class="bg-black/30 rounded-2xl p-4 h-48 overflow-y-auto" id="teacherListContainer">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -129,49 +236,31 @@
 
         const SUPER_ADMIN = "ntun21933@ntun.ac.th";
         let currentUser = null;
+        let activeRoomId = null;
+        let classrooms = {};
+        
+        let globalDeadline = null;
         let systemRoles = { teachers: [] };
+        let timerInterval = null;
+        let isExpired = false;
 
-        // -------------------------------------------------------------
-        // ระบบถอดรหัส Google แบบใหม่ ป้องกันบัคหน้าขาวใน iPad / iPhone (Safari)
-        // -------------------------------------------------------------
         function decodeJwt(token) {
-            try {
-                let base64Url = token.split('.')[1];
-                let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                while (base64.length % 4) { base64 += '='; } // เติม Padding ให้ครบ
-                let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(jsonPayload);
-            } catch (e) {
-                console.error("Decode Error:", e);
-                return null;
-            }
+            try { return JSON.parse(decodeURIComponent(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))); } catch (e) { return null; }
         }
 
-        window.handleGoogleLogin = async function(response) {
-            try {
-                const payload = decodeJwt(response.credential);
-                
-                if (!payload) {
-                    return Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ถอดรหัสบัญชีไม่ได้ ลองใหม่อีกครั้งบนบราวเซอร์ Chrome', background: 'rgba(255,255,255,0.9)' });
-                }
-
-                const email = payload.email.toLowerCase();
-                currentUser = { email, name: payload.name, role: 'student', picture: payload.picture }; 
-                localStorage.setItem('ntun_session_v15', JSON.stringify(currentUser));
-                
-                initApp();
-            } catch (error) {
-                Swal.fire({ icon: 'error', title: 'ระบบขัดข้อง', text: error.message });
-            }
+        async function handleGoogleLogin(response) {
+            const payload = decodeJwt(response.credential);
+            const email = payload.email.toLowerCase();
+            
+            // ลบการเช็ค @ntun.ac.th ออกให้แล้ว ใครล็อกอินก็ได้
+            currentUser = { email, name: payload.name, role: 'student', picture: payload.picture }; 
+            localStorage.setItem('ntun_session_v15', JSON.stringify(currentUser));
+            initApp();
         }
-        // -------------------------------------------------------------
 
         function initApp() {
             const saved = localStorage.getItem('ntun_session_v15');
             if (!saved) return;
-            
             currentUser = JSON.parse(saved);
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('mainApp').classList.remove('hidden');
@@ -179,7 +268,7 @@
             const shortName = currentUser.name.split(' ').slice(0,2).join(' ');
             document.getElementById('userName').innerText = shortName;
             document.getElementById('userImg').src = currentUser.picture;
-            document.getElementById('welcomeName').innerText = shortName;
+            if(document.getElementById('welcomeName')) document.getElementById('welcomeName').innerText = shortName;
 
             db.collection("settings").doc("roles").onSnapshot(doc => {
                 if(doc.exists) systemRoles = doc.data();
@@ -189,36 +278,126 @@
                 else if (systemRoles.teachers && systemRoles.teachers.includes(currentUser.email)) currentUser.role = 'teacher';
                 else currentUser.role = 'student';
 
-                if(['super_admin', 'teacher'].includes(currentUser.role)) {
+                const isStaff = ['super_admin', 'teacher'].includes(currentUser.role);
+                
+                if(isStaff) {
+                    document.getElementById('staffAction').classList.remove('hidden');
                     document.getElementById('btnSettings').classList.remove('hidden');
                     const badge = document.getElementById('roleBadge');
                     badge.innerText = currentUser.role === 'super_admin' ? 'SUPER ADMIN' : 'TEACHER';
                     badge.classList.remove('hidden');
+                } else {
+                    document.getElementById('staffAction').classList.add('hidden');
+                    document.getElementById('btnSettings').classList.add('hidden');
+                    document.getElementById('roleBadge').classList.add('hidden');
                 }
-                renderDashboard();
+                
+                renderUI();
                 renderTeacherList();
+            });
+
+            db.collection("settings").doc("system").onSnapshot(doc => {
+                if(doc.exists) {
+                    globalDeadline = doc.data().globalDeadline;
+                    startGlobalTimer(globalDeadline);
+                } else {
+                    db.collection("settings").doc("system").set({ globalDeadline: null });
+                }
+            });
+
+            db.collection("classrooms").onSnapshot(snap => {
+                classrooms = {};
+                snap.forEach(doc => { classrooms[doc.id] = doc.data(); });
+                renderUI();
+                updateStats();
             });
         }
 
-        function renderDashboard() {
-            document.getElementById('contentArea').innerHTML = `
-                <div class="text-center py-10">
-                    <i class='bx bx-check-circle text-6xl text-green-400 mb-4'></i>
-                    <h3 class="text-2xl font-bold text-white">เข้าสู่ระบบสำเร็จ!</h3>
-                    <p class="text-white/80 mt-2">คุณกำลังล็อกอินด้วยอีเมล: <span class="font-bold text-[#5AB2FF]">${currentUser.email}</span></p>
-                </div>
-            `;
+        function logout() { localStorage.removeItem('ntun_session_v15'); location.reload(); }
+
+        // --- ระบบคัดลอกรหัสเข้าห้อง ---
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const Toast = Swal.mixin({
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
+                    timerProgressBar: true, background: 'rgba(255,255,255,0.95)'
+                });
+                Toast.fire({ icon: 'success', title: `คัดลอกรหัส ${text} สำเร็จ!` });
+            });
+        }
+
+        function startGlobalTimer(deadline) {
+            clearInterval(timerInterval);
+            const banner = document.getElementById('globalTimerBanner');
+            
+            if (!deadline) {
+                banner.classList.add('hidden');
+                isExpired = false;
+                return;
+            }
+
+            banner.classList.remove('hidden');
+            timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = deadline - now;
+                const container = document.getElementById('globalCountdownContainer');
+                
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    isExpired = true;
+                    if(container) container.innerHTML = `<div class="expired-text"><i class='bx bxs-lock'></i> หมดเวลาการจองแล้ว</div>`;
+                    return;
+                }
+                
+                isExpired = false;
+                if(document.getElementById('gt-d')) {
+                    const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                    document.getElementById('gt-d').innerText = d.toString().padStart(2, '0');
+                    document.getElementById('gt-h').innerText = h.toString().padStart(2, '0');
+                    document.getElementById('gt-m').innerText = m.toString().padStart(2, '0');
+                    document.getElementById('gt-s').innerText = s.toString().padStart(2, '0');
+                }
+            }, 1000);
+        }
+
+        async function setGlobalDeadlineUI() {
+            const { value: datetime } = await Swal.fire({
+                title: 'ตั้งเวลาปิดจองทั้งระบบ',
+                html: `<div class="text-left text-slate-700 text-sm mb-2 font-bold">เลือกวันและเวลาที่สิ้นสุด:</div>
+                       <input type="datetime-local" id="deadline-input" class="w-full bg-slate-100 p-4 rounded-xl border border-slate-300 focus:outline-[#5AB2FF]">`,
+                focusConfirm: false, showCancelButton: true, confirmButtonText: 'บันทึกเวลา', confirmButtonColor: '#5AB2FF', background: 'rgba(255,255,255,0.95)',
+                preConfirm: () => document.getElementById('deadline-input').value
+            });
+
+            if (datetime) {
+                const timestamp = new Date(datetime).getTime();
+                await db.collection("settings").doc("system").update({ globalDeadline: timestamp });
+                Swal.fire({ title: 'บันทึกสำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false, background: 'rgba(255,255,255,0.95)' });
+                changePage('home');
+            }
+        }
+
+        async function clearGlobalDeadline() {
+            await db.collection("settings").doc("system").update({ globalDeadline: null });
+            Swal.fire({ title: 'ยกเลิกเวลาสำเร็จ', text: 'ระบบเปิดให้จองตลอดเวลาแล้ว', icon: 'success', timer: 1500, showConfirmButton: false, background: 'rgba(255,255,255,0.95)' });
         }
 
         async function addTeacher() {
             const email = document.getElementById('newTeacherEmail').value.trim().toLowerCase();
-            if(!email) return Swal.fire({ icon: 'error', title: 'กรุณากรอกอีเมล' });
+            // เอาการเช็ค @ntun.ac.th ออกตอนแอดครูด้วย
+            if(!email) return Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'กรุณาใส่อีเมล', background: 'rgba(255,255,255,0.95)' });
+            
             let teachers = systemRoles.teachers || [];
-            if(teachers.includes(email)) return Swal.fire({ icon: 'info', title: 'มีรายชื่ออยู่แล้ว' });
+            if(teachers.includes(email)) return Swal.fire({ icon: 'info', title: 'มีรายชื่ออยู่แล้ว', background: 'rgba(255,255,255,0.95)' });
+            
             teachers.push(email);
             await db.collection("settings").doc("roles").update({ teachers });
             document.getElementById('newTeacherEmail').value = '';
-            Swal.fire({ title: 'เพิ่มสำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false });
+            Swal.fire({ title: 'เพิ่มสิทธิ์สำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false, background: 'rgba(255,255,255,0.95)' });
         }
 
         async function removeTeacher(email) {
@@ -229,14 +408,16 @@
 
         function renderTeacherList() {
             const container = document.getElementById('teacherListContainer');
+            if(!container) return;
             const teachers = systemRoles.teachers || [];
             if(teachers.length === 0) {
-                container.innerHTML = `<div class="text-center text-white/50 mt-10">ยังไม่มีรายชื่อครู</div>`; return;
+                container.innerHTML = `<div class="text-center text-white/50 mt-10">ยังไม่มีรายชื่อครูในระบบ</div>`;
+                return;
             }
             container.innerHTML = teachers.map(email => `
                 <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl mb-2 border border-white/10">
-                    <span class="font-medium text-white">${email}</span>
-                    <button onclick="removeTeacher('${email}')" class="text-red-400 hover:text-red-300 bg-red-500/20 px-3 py-1 rounded-lg text-xs font-bold"><i class='bx bx-trash'></i> ลบ</button>
+                    <div class="flex items-center gap-3"><i class='bx bxs-user-circle text-2xl text-[#5AB2FF]'></i> <span class="font-medium text-sm text-white">${email}</span></div>
+                    <button onclick="removeTeacher('${email}')" class="text-red-400 hover:text-red-300 bg-red-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class='bx bx-trash'></i> ลบ</button>
                 </div>
             `).join('');
         }
@@ -244,14 +425,75 @@
         function changePage(page) {
             document.getElementById('viewHome').classList.add('hidden');
             document.getElementById('viewSettings').classList.add('hidden');
-            if (page === 'home') document.getElementById('viewHome').classList.remove('hidden');
-            else if (page === 'settings' && ['super_admin', 'teacher'].includes(currentUser.role)) document.getElementById('viewSettings').classList.remove('hidden');
+            
+            if (page === 'home') {
+                activeRoomId = null;
+                document.getElementById('viewHome').classList.remove('hidden');
+                renderUI();
+            } else if (page === 'settings' && ['super_admin', 'teacher'].includes(currentUser.role)) {
+                activeRoomId = null;
+                document.getElementById('viewSettings').classList.remove('hidden');
+            }
         }
 
-        function logout() { localStorage.removeItem('ntun_session_v15'); location.reload(); }
+        function updateStats() {
+            if (!['super_admin', 'teacher'].includes(currentUser?.role)) { document.getElementById('dashboardStats').innerHTML = ''; return; }
+            let totalR = Object.keys(classrooms).length; let totalS = 0; let totalB = 0;
+            Object.values(classrooms).forEach(r => { totalS += r.seats.length; totalB += r.seats.filter(s => s.bookedBy).length; });
+            document.getElementById('dashboardStats').innerHTML = `
+                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">ห้องเรียนทั้งหมด</span><span class="text-2xl font-black text-white">${totalR}</span></div>
+                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">ที่นั่งทั้งหมด</span><span class="text-2xl font-black text-white">${totalS}</span></div>
+                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">ถูกจองแล้ว</span><span class="text-2xl font-black text-red-200">${totalB}</span></div>
+                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">เปอร์เซ็นต์จอง</span><span class="text-2xl font-black text-green-300">${totalS > 0 ? Math.round((totalB/totalS)*100) : 0}%</span></div>
+            `;
+        }
 
-        // เช็คการคงสถานะ Login
-        window.onload = () => { if(localStorage.getItem('ntun_session_v15')) initApp(); };
-    </script>
-</body>
-</html>
+        function renderUI() {
+            if(activeRoomId) {
+                document.getElementById('welcomeSection').classList.add('hidden');
+                document.getElementById('staffAction')?.classList.add('hidden');
+                renderRoomView();
+            } else {
+                document.getElementById('welcomeSection').classList.remove('hidden');
+                if(['super_admin', 'teacher'].includes(currentUser.role)) document.getElementById('staffAction').classList.remove('hidden');
+                renderDashboard();
+            }
+        }
+
+        function renderDashboard() {
+            const area = document.getElementById('contentArea');
+            const isStaff = ['super_admin', 'teacher'].includes(currentUser.role);
+            const query = document.getElementById('roomSearch')?.value.toLowerCase() || '';
+            let html = '';
+            
+            if (isStaff) {
+                // แปลงเป็น Array และกรองข้อมูลตามคำค้นหา
+                let roomsArr = Object.entries(classrooms)
+                    .map(([id, data]) => ({ id, ...data }))
+                    .filter(room => room.name.toLowerCase().includes(query) || room.id.toLowerCase().includes(query));
+                
+                // 1. เรียงลำดับชื่อห้องตามตัวเลข (เช่น 1/1, 1/2, 1/10)
+                roomsArr.sort((a, b) => a.name.localeCompare(b.name, 'th', { numeric: true }));
+
+                // 2. จัดกลุ่มตามระดับชั้น ม.
+                const groups = {};
+                roomsArr.forEach(room => {
+                    // ดึงตัวเลขตัวแรกออกมาจากชื่อห้อง เพื่อใช้เป็นระดับชั้น
+                    const match = room.name.match(/\d+/);
+                    const levelNum = match ? parseInt(match[0]) : 999;
+                    const groupName = match ? `ระดับชั้น ม.${levelNum}` : 'อื่นๆ';
+                    
+                    if (!groups[groupName]) groups[groupName] = { level: levelNum, rooms: [] };
+                    groups[groupName].rooms.push(room);
+                });
+
+                // 3. เรียงลำดับกลุ่ม (ม.1 -> ม.2 -> ...)
+                const sortedGroupKeys = Object.keys(groups).sort((a, b) => groups[a].level - groups[b].level);
+
+                if (sortedGroupKeys.length === 0) {
+                    html = `<div class="text-center py-20 glass-panel rounded-3xl"><i class='bx bx-folder-open text-6xl text-white/50 mb-4'></i><p class="text-white/80 font-medium text-lg">ยังไม่มีข้อมูลห้องเรียน</p></div>`;
+                } else {
+                    html = `<div class="space-y-10 animate-in">`;
+                    
+                    sortedGroupKeys.forEach(groupKey => {
+                        const group = groups[gro
