@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NTUN Space - M.1 Seating</title>
+    <title>NTUN Space - Premium Seating</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,7 +53,6 @@
             border: 1px solid var(--glass-border); box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.15);
         }
 
-        /* ดีไซน์โต๊ะเรียน */
         .desk { 
             width: 70px; height: 85px; position: absolute; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             cursor: pointer; touch-action: none; z-index: 20;
@@ -67,8 +66,7 @@
 
         .booked .desk-chair { fill: rgba(239, 68, 68, 0.6); stroke: #ef4444; }
         .booked .desk-top { fill: rgba(248, 113, 113, 0.8); stroke: #fee2e2; }
-        .booked:hover:not(.dragging) { transform: none; cursor: not-allowed; }
-
+        
         .my-seat .desk-chair { fill: rgba(34, 197, 94, 0.6); stroke: #22c55e; }
         .my-seat .desk-top { fill: rgba(74, 222, 128, 0.9); stroke: #ffffff; filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.8)); }
         
@@ -94,7 +92,6 @@
         
         #g_id_onload, .g_id_signin { background-color: white; border-radius: 999px; }
 
-        /* นาฬิกานับถอยหลัง Global */
         .countdown-box { display: flex; gap: 12px; align-items: center; justify-content: center; }
         .time-block { 
             background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2);
@@ -115,26 +112,24 @@
     <div id="loginPage" class="relative z-10 flex min-h-screen items-center justify-center p-4">
         <div class="glass-panel p-6 md:p-10 w-full max-w-sm md:max-w-md text-center rounded-[2.5rem] animate-in mx-auto">
             <div class="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 relative hover:scale-105 transition-transform">
-                <img src="photo/logo.png" alt="Logo" class="relative z-10 w-full h-full object-contain drop-shadow-xl" onerror="this.src='https://via.placeholder.com/150?text=Logo'">
+                <img src="photo/logo.png" alt="Logo" class="relative z-10 w-full h-full object-contain drop-shadow-xl">
             </div>
             <h1 class="text-3xl md:text-4xl font-black mb-1 tracking-tight text-white uppercase drop-shadow-md">NTUN SPACE</h1>
-            <p class="text-white/90 mb-8 font-light text-sm">ระบบจองที่นั่งออนไลน์พรีเมียม (สำหรับ ม.1)</p>
+            <p class="text-white/90 mb-8 font-light text-sm">ระบบจองที่นั่งออนไลน์ (All Email Access)</p>
             
             <div class="bg-white rounded-full p-1.5 w-max max-w-[95%] overflow-hidden mx-auto mb-4 shadow-xl hover:shadow-2xl transition-all flex justify-center items-center">
                 <div id="g_id_onload" data-client_id="118310489688-8o6l3ogkihci3des8aab8qdd83a7r6gg.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
                 <div class="g_id_signin flex justify-center w-full scale-90 md:scale-100 origin-center" data-type="standard" data-shape="pill" data-theme="outline" data-size="large"></div>
             </div>
-            <p class="mt-6 text-[10px] md:text-[11px] opacity-80 font-medium tracking-wide text-white uppercase">เข้าสู่ระบบด้วยบัญชี Google ส่วนตัวได้เลย</p>
+            <p class="mt-6 text-[10px] md:text-[11px] opacity-80 font-medium tracking-wide text-white uppercase">ล็อคอินด้วยอีเมลอะไรก็ได้</p>
         </div>
     </div>
 
     <div id="mainApp" class="hidden min-h-screen flex flex-col relative z-10">
         <header class="p-4 md:p-6 flex flex-col sm:flex-row justify-between items-center gap-4 max-w-7xl mx-auto w-full animate-in">
             <div class="glass-panel px-5 py-2 flex items-center gap-4 rounded-full">
-                <div class="w-10 h-10 flex items-center justify-center">
-                    <img src="photo/logo.png" class="w-full h-full object-contain drop-shadow-md" onerror="this.src='https://via.placeholder.com/150?text=Logo'">
-                </div>
-                <div class="text-left"><h1 class="text-white font-bold text-sm md:text-base leading-tight uppercase tracking-widest drop-shadow-sm">NTUN SPACE</h1><p class="text-white/80 text-[10px] md:text-xs">M.1 Seating</p></div>
+                <div class="w-10 h-10 flex items-center justify-center"><img src="photo/logo.png" class="w-full h-full object-contain drop-shadow-md"></div>
+                <div class="text-left"><h1 class="text-white font-bold text-sm md:text-base leading-tight uppercase tracking-widest drop-shadow-sm">NTUN SPACE</h1><p class="text-white/80 text-[10px] md:text-xs">Premium Seating</p></div>
             </div>
             <div class="glass-panel p-1.5 flex items-center gap-2 rounded-full">
                 <button onclick="changePage('home')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all"><i class='bx bx-home-alt text-lg'></i> <span class="hidden md:inline">หน้าแรก</span></button>
@@ -160,7 +155,7 @@
             <div id="viewHome">
                 <section id="welcomeSection" class="mt-4 mb-8 text-left animate-in" style="animation-delay: 0.1s;">
                     <p class="text-white/90 mb-1 font-light tracking-wide">ยินดีต้อนรับกลับมา</p>
-                    <h2 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-white drop-shadow-lg">สวัสดี, <span id="welcomeName">นักเรียน</span> <span id="roleBadge" class="hidden text-sm align-middle bg-[#5AB2FF] text-white px-3 py-1 rounded-full shadow-md ml-2 border border-white/50"></span></h2>
+                    <h2 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-white drop-shadow-lg">สวัสดี, <span id="welcomeName">ผู้ใช้งาน</span> <span id="roleBadge" class="hidden text-sm align-middle bg-[#5AB2FF] text-white px-3 py-1 rounded-full shadow-md ml-2 border border-white/50"></span></h2>
                     <div id="dashboardStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
                 </section>
 
@@ -192,34 +187,23 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="bg-black/20 p-6 rounded-3xl border border-white/10 shadow-inner">
                             <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class='bx bx-time'></i> ตั้งเวลาปิดจองทั้งเว็บ</h3>
-                            <p class="text-sm text-white/80 mb-6">หากเวลาหมดลง นักเรียนจะไม่สามารถทำการจองที่นั่งหรือสุ่มที่นั่งได้ในทุกห้องเรียน</p>
-                            
                             <div class="flex flex-col gap-3">
-                                <button onclick="setGlobalDeadlineUI()" class="bg-[#5AB2FF] hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all flex justify-center items-center gap-2">
-                                    <i class='bx bx-calendar-edit text-lg'></i> ตั้งเวลา / แก้ไขเวลา
-                                </button>
-                                <button onclick="clearGlobalDeadline()" class="bg-red-500/20 hover:bg-red-500/40 border border-red-400/50 text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all flex justify-center items-center gap-2">
-                                    <i class='bx bx-trash text-lg'></i> ยกเลิกเวลา (เปิดจองตลอด)
-                                </button>
+                                <button onclick="setGlobalDeadlineUI()" class="bg-[#5AB2FF] hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all flex justify-center items-center gap-2"><i class='bx bx-calendar-edit text-lg'></i> ตั้งเวลา / แก้ไขเวลา</button>
+                                <button onclick="clearGlobalDeadline()" class="bg-red-500/20 hover:bg-red-500/40 border border-red-400/50 text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all flex justify-center items-center gap-2"><i class='bx bx-trash text-lg'></i> ยกเลิกเวลา</button>
                             </div>
                         </div>
 
                         <div class="bg-black/20 p-6 rounded-3xl border border-white/10 shadow-inner">
                             <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class='bx bxs-user-badge'></i> จัดการสิทธิ์ "ครู"</h3>
-                            <p class="text-sm text-white/80 mb-6">ครูสามารถสร้างห้องเรียน กำหนดจำนวนที่นั่ง และขยับจัดผังโต๊ะได้</p>
-                            
                             <div class="flex gap-2 mb-6">
-                                <input type="email" id="newTeacherEmail" placeholder="ใส่อีเมล Google ทั่วไป..." class="flex-1 bg-white/10 border border-white/30 rounded-xl px-4 py-3 outline-none text-white placeholder:text-white/50 focus:bg-white/20 transition-all">
+                                <input type="email" id="newTeacherEmail" placeholder="ใส่อีเมลแอดมิน..." class="flex-1 bg-white/10 border border-white/30 rounded-xl px-4 py-3 outline-none text-white placeholder:text-white/50 focus:bg-white/20 transition-all">
                                 <button onclick="addTeacher()" class="bg-white text-[#5AB2FF] px-6 py-3 rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-md">เพิ่ม</button>
                             </div>
-
-                            <div class="bg-black/30 rounded-2xl p-4 h-48 overflow-y-auto" id="teacherListContainer">
-                                </div>
+                            <div class="bg-black/30 rounded-2xl p-4 h-48 overflow-y-auto" id="teacherListContainer"></div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 
@@ -235,6 +219,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // สามารถแก้อีเมล Admin สูงสุดตรงนี้
         const SUPER_ADMIN = "ntun21933@ntun.ac.th";
         let currentUser = null;
         let activeRoomId = null;
@@ -244,8 +229,6 @@
         let systemRoles = { teachers: [] };
         let timerInterval = null;
         let isExpired = false;
-        
-        // ตัวแปรสำหรับระบบลากโต๊ะ
         let dragId = null, isMoving = false, startX, startY, initX, initY;
 
         function decodeJwt(token) {
@@ -256,15 +239,14 @@
             const payload = decodeJwt(response.credential);
             const email = payload.email.toLowerCase();
             
-            // ลบการเช็ค @ntun.ac.th ออก เพื่ออนุญาตอีเมลอะไรก็ได้
-            
+            // --- ปลดล็อคโดเมนแล้ว (เอา email.endsWith ออก) ---
             currentUser = { email, name: payload.name, role: 'student', picture: payload.picture }; 
-            localStorage.setItem('ntun_session_v15', JSON.stringify(currentUser));
+            localStorage.setItem('ntun_session_v16', JSON.stringify(currentUser));
             initApp();
         }
 
         function initApp() {
-            const saved = localStorage.getItem('ntun_session_v15');
+            const saved = localStorage.getItem('ntun_session_v16');
             if (!saved) return;
             currentUser = JSON.parse(saved);
             document.getElementById('loginPage').style.display = 'none';
@@ -296,7 +278,6 @@
                     document.getElementById('btnSettings').classList.add('hidden');
                     document.getElementById('roleBadge').classList.add('hidden');
                 }
-                
                 renderUI();
                 renderTeacherList();
             });
@@ -305,35 +286,24 @@
                 if(doc.exists) {
                     globalDeadline = doc.data().globalDeadline;
                     startGlobalTimer(globalDeadline);
-                } else {
-                    db.collection("settings").doc("system").set({ globalDeadline: null });
                 }
             });
 
             db.collection("classrooms").onSnapshot(snap => {
                 const oldCounts = {};
                 for(let k in classrooms) oldCounts[k] = classrooms[k].seats?.length;
-
                 classrooms = {};
                 snap.forEach(doc => { classrooms[doc.id] = doc.data(); });
-                
                 if (dragId) return;
-
                 if (activeRoomId && classrooms[activeRoomId]) {
-                    if (oldCounts[activeRoomId] !== classrooms[activeRoomId].seats.length) {
-                        renderUI(); 
-                    } else {
-                        updateRoomViewDynamically(); 
-                    }
-                } else {
-                    renderUI();
-                }
-                
+                    if (oldCounts[activeRoomId] !== classrooms[activeRoomId].seats.length) renderUI();
+                    else updateRoomViewDynamically();
+                } else renderUI();
                 updateStats();
             });
         }
 
-        function logout() { localStorage.removeItem('ntun_session_v15'); location.reload(); }
+        function logout() { localStorage.removeItem('ntun_session_v16'); location.reload(); }
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
@@ -348,46 +318,28 @@
         function updateRoomViewDynamically() {
             if (!activeRoomId || !classrooms[activeRoomId] || dragId) return;
             const room = classrooms[activeRoomId];
-            
             room.seats.forEach(s => {
                 const el = document.getElementById('desk-' + s.id);
                 if (!el) return;
-
                 const isMe = s.bookedBy === currentUser.email;
-                const stateClass = isMe ? 'my-seat' : (s.bookedBy ? 'booked' : '');
-                
-                el.className = `desk ${stateClass}`;
-                el.style.left = s.x + 'px';
-                el.style.top = s.y + 'px';
-
-                let label = s.id; 
-                let tooltipText = "ว่าง";
-
-                if (isMe) { 
-                    label = "ME"; tooltipText = "ที่นั่งของคุณ"; 
-                } else if (s.bookedBy) { 
-                    label = s.name.split(' ')[0]; tooltipText = s.name; 
-                }
-
-                let tooltipHtml = (s.bookedBy && s.picture) 
-                    ? `<img src="${s.picture}" class="w-5 h-5 rounded-full object-cover shadow-sm"> <span>${tooltipText}</span>` 
-                    : `<span>${tooltipText}</span>`;
+                el.className = `desk ${isMe ? 'my-seat' : (s.bookedBy ? 'booked' : '')}`;
+                el.style.left = s.x + 'px'; el.style.top = s.y + 'px';
                 
                 const tooltipEl = el.querySelector('.desk-tooltip');
-                if(tooltipEl) tooltipEl.innerHTML = tooltipHtml;
+                let label = s.id; let tText = "ว่าง";
+                if (isMe) { label = "ME"; tText = "ที่นั่งของคุณ"; }
+                else if (s.bookedBy) { label = s.name.split(' ')[0]; tText = s.name; }
                 
-                const avatarImg = el.querySelector('.avatar-overlay');
+                if(tooltipEl) tooltipEl.innerHTML = (s.bookedBy && s.picture) ? `<img src="${s.picture}" class="w-5 h-5 rounded-full object-cover"> <span>${tText}</span>` : `<span>${tText}</span>`;
+                
+                const avatar = el.querySelector('.avatar-overlay');
                 const labelEl = el.querySelector('.desk-label');
-
                 if (s.bookedBy && s.picture) {
-                    if (avatarImg) { avatarImg.src = s.picture; avatarImg.classList.remove('hidden'); }
+                    if (avatar) { avatar.src = s.picture; avatar.classList.remove('hidden'); }
                     if (labelEl) labelEl.classList.add('hidden');
                 } else {
-                    if (avatarImg) avatarImg.classList.add('hidden');
-                    if (labelEl) {
-                        labelEl.classList.remove('hidden');
-                        labelEl.innerText = label;
-                    }
+                    if (avatar) avatar.classList.add('hidden');
+                    if (labelEl) { labelEl.classList.remove('hidden'); labelEl.innerText = label; }
                 }
             });
         }
@@ -395,37 +347,27 @@
         function startGlobalTimer(deadline) {
             clearInterval(timerInterval);
             const banner = document.getElementById('globalTimerBanner');
-            
-            if (!deadline) {
-                banner.classList.add('hidden');
-                isExpired = false;
-                return;
-            }
-
+            if (!deadline) { banner.classList.add('hidden'); isExpired = false; return; }
             banner.classList.remove('hidden');
             timerInterval = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = deadline - now;
                 const container = document.getElementById('globalCountdownContainer');
-                
                 if (distance < 0) {
-                    clearInterval(timerInterval);
-                    isExpired = true;
+                    clearInterval(timerInterval); isExpired = true;
                     if(container) container.innerHTML = `<div class="expired-text"><i class='bx bxs-lock'></i> หมดเวลาการจองแล้ว</div>`;
                     return;
                 }
-                
                 isExpired = false;
                 if(document.getElementById('gt-d')) {
-                    const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((distance % (1000 * 60)) / 1000);
-                    
-                    document.getElementById('gt-d').innerText = d.toString().padStart(2, '0');
-                    document.getElementById('gt-h').innerText = h.toString().padStart(2, '0');
-                    document.getElementById('gt-m').innerText = m.toString().padStart(2, '0');
-                    document.getElementById('gt-s').innerText = s.toString().padStart(2, '0');
+                    const d = Math.floor(distance / (86400000));
+                    const h = Math.floor((distance % 86400000) / 3600000);
+                    const m = Math.floor((distance % 3600000) / 60000);
+                    const s = Math.floor((distance % 60000) / 1000);
+                    document.getElementById('gt-d').innerText = d.toString().padStart(2,'0');
+                    document.getElementById('gt-h').innerText = h.toString().padStart(2,'0');
+                    document.getElementById('gt-m').innerText = m.toString().padStart(2,'0');
+                    document.getElementById('gt-s').innerText = s.toString().padStart(2,'0');
                 }
             }, 1000);
         }
@@ -433,38 +375,28 @@
         async function setGlobalDeadlineUI() {
             const { value: datetime } = await Swal.fire({
                 title: 'ตั้งเวลาปิดจองทั้งระบบ',
-                html: `<div class="text-left text-slate-700 text-sm mb-2 font-bold">เลือกวันและเวลาที่สิ้นสุด:</div>
-                       <input type="datetime-local" id="deadline-input" class="w-full bg-slate-100 p-4 rounded-xl border border-slate-300 focus:outline-[#5AB2FF]">`,
-                focusConfirm: false, showCancelButton: true, confirmButtonText: 'บันทึกเวลา', confirmButtonColor: '#5AB2FF', background: 'rgba(255,255,255,0.95)',
+                html: `<input type="datetime-local" id="deadline-input" class="w-full bg-slate-100 p-4 rounded-xl border border-slate-300">`,
+                showCancelButton: true, confirmButtonText: 'บันทึก', background: 'rgba(255,255,255,0.95)',
                 preConfirm: () => document.getElementById('deadline-input').value
             });
-
             if (datetime) {
-                const timestamp = new Date(datetime).getTime();
-                await db.collection("settings").doc("system").update({ globalDeadline: timestamp });
-                Swal.fire({ title: 'บันทึกสำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false, background: 'rgba(255,255,255,0.95)' });
-                changePage('home');
+                await db.collection("settings").doc("system").set({ globalDeadline: new Date(datetime).getTime() });
+                Swal.fire({ title: 'สำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false });
             }
         }
 
         async function clearGlobalDeadline() {
-            await db.collection("settings").doc("system").update({ globalDeadline: null });
-            Swal.fire({ title: 'ยกเลิกเวลาสำเร็จ', text: 'ระบบเปิดให้จองตลอดเวลาแล้ว', icon: 'success', timer: 1500, showConfirmButton: false, background: 'rgba(255,255,255,0.95)' });
+            await db.collection("settings").doc("system").set({ globalDeadline: null });
+            Swal.fire({ title: 'ยกเลิกเวลาสำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false });
         }
 
         async function addTeacher() {
             const email = document.getElementById('newTeacherEmail').value.trim().toLowerCase();
-            
-            // ลบเงื่อนไขการเช็คโดเมน เช็คแค่ว่ากรอกข้อมูลหรือยัง
-            if(!email) return Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'กรุณากรอกอีเมล', background: 'rgba(255,255,255,0.95)' });
-            
+            if(!email) return;
             let teachers = systemRoles.teachers || [];
-            if(teachers.includes(email)) return Swal.fire({ icon: 'info', title: 'มีรายชื่ออยู่แล้ว', background: 'rgba(255,255,255,0.95)' });
-            
-            teachers.push(email);
+            if(!teachers.includes(email)) teachers.push(email);
             await db.collection("settings").doc("roles").update({ teachers });
             document.getElementById('newTeacherEmail').value = '';
-            Swal.fire({ title: 'เพิ่มสิทธิ์สำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false, background: 'rgba(255,255,255,0.95)' });
         }
 
         async function removeTeacher(email) {
@@ -477,140 +409,237 @@
             const container = document.getElementById('teacherListContainer');
             if(!container) return;
             const teachers = systemRoles.teachers || [];
-            if(teachers.length === 0) {
-                container.innerHTML = `<div class="text-center text-white/50 mt-10">ยังไม่มีรายชื่อครูในระบบ</div>`;
-                return;
-            }
-            container.innerHTML = teachers.map(email => `
-                <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl mb-2 border border-white/10">
-                    <div class="flex items-center gap-3"><i class='bx bxs-user-circle text-2xl text-[#5AB2FF]'></i> <span class="font-medium text-sm text-white">${email}</span></div>
-                    <button onclick="removeTeacher('${email}')" class="text-red-400 hover:text-red-300 bg-red-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class='bx bx-trash'></i> ลบ</button>
-                </div>
-            `).join('');
+            container.innerHTML = teachers.map(email => `<div class="flex justify-between items-center bg-white/10 p-3 rounded-xl mb-2"><span>${email}</span><button onclick="removeTeacher('${email}')" class="text-red-400 text-xs">ลบ</button></div>`).join('');
         }
 
         function changePage(page) {
             document.getElementById('viewHome').classList.add('hidden');
             document.getElementById('viewSettings').classList.add('hidden');
-            
-            if (page === 'home') {
-                activeRoomId = null;
-                document.getElementById('viewHome').classList.remove('hidden');
-                renderUI();
-            } else if (page === 'settings' && ['super_admin', 'teacher'].includes(currentUser.role)) {
-                activeRoomId = null;
-                document.getElementById('viewSettings').classList.remove('hidden');
-            }
+            if (page === 'home') { activeRoomId = null; document.getElementById('viewHome').classList.remove('hidden'); renderUI(); }
+            else { document.getElementById('viewSettings').classList.remove('hidden'); }
         }
 
         function updateStats() {
             if (!['super_admin', 'teacher'].includes(currentUser?.role)) { document.getElementById('dashboardStats').innerHTML = ''; return; }
             let totalR = Object.keys(classrooms).length; let totalS = 0; let totalB = 0;
             Object.values(classrooms).forEach(r => { totalS += r.seats.length; totalB += r.seats.filter(s => s.bookedBy).length; });
-            document.getElementById('dashboardStats').innerHTML = `
-                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">ห้องเรียนทั้งหมด</span><span class="text-2xl font-black text-white">${totalR}</span></div>
-                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">ที่นั่งทั้งหมด</span><span class="text-2xl font-black text-white">${totalS}</span></div>
-                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">ถูกจองแล้ว</span><span class="text-2xl font-black text-red-300">${totalB}</span></div>
-                <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center"><span class="text-white/70 text-xs font-semibold uppercase">ที่นั่งว่าง</span><span class="text-2xl font-black text-green-300">${totalS - totalB}</span></div>
-            `;
-        }
-
-        function renderDashboard() {
-            const content = document.getElementById('contentArea');
-            if (!content) return;
-
-            let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in">';
-            const searchInput = document.getElementById('roomSearch');
-            const query = searchInput ? searchInput.value.toLowerCase() : '';
-            
-            let hasRooms = false;
-            Object.keys(classrooms).forEach(id => {
-                const room = classrooms[id];
-                if (query && !room.name.toLowerCase().includes(query) && !id.toLowerCase().includes(query)) return;
-                
-                hasRooms = true;
-                const total = room.seats ? room.seats.length : 0;
-                const booked = room.seats ? room.seats.filter(s => s.bookedBy).length : 0;
-                
-                html += `
-                    <div onclick="openRoom('${id}')" class="glass-panel p-6 rounded-[2rem] cursor-pointer hover:scale-[1.03] transition-transform border border-white/20 shadow-lg relative overflow-hidden group">
-                        <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <h3 class="text-2xl font-bold text-white mb-1 drop-shadow-md">${room.name || 'ไม่มีชื่อห้อง'}</h3>
-                        <p class="text-white/60 text-xs mb-5 font-light tracking-wider">ROOM ID: ${id}</p>
-                        <div class="flex justify-between items-center text-sm font-medium">
-                            <span class="bg-white/20 px-3 py-1.5 rounded-full text-white shadow-inner">ทั้งหมด ${total}</span>
-                            <span class="${booked >= total && total > 0 ? 'bg-red-500/80' : 'bg-[#5AB2FF]/80'} px-3 py-1.5 rounded-full text-white shadow-md">
-                                ${booked >= total && total > 0 ? 'เต็มแล้ว' : `จองแล้ว ${booked}`}
-                            </span>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (!hasRooms) {
-                html += `<div class="col-span-full text-center text-white/70 py-10">ไม่พบห้องเรียนที่ค้นหา หรือยังไม่มีห้องเรียนในระบบ</div>`;
-            }
-
-            html += '</div>';
-            content.innerHTML = html;
+            document.getElementById('dashboardStats').innerHTML = `<div class="glass-panel p-4 rounded-2xl text-center"><span>ห้อง: ${totalR}</span></div><div class="glass-panel p-4 rounded-2xl text-center"><span>ที่นั่ง: ${totalS}</span></div><div class="glass-panel p-4 rounded-2xl text-center"><span>จอง: ${totalB}</span></div><div class="glass-panel p-4 rounded-2xl text-center"><span>${totalS > 0 ? Math.round((totalB/totalS)*100) : 0}%</span></div>`;
         }
 
         function renderUI() {
-            if (activeRoomId) {
-                const content = document.getElementById('contentArea');
-                content.innerHTML = `
-                    <div class="animate-in glass-panel p-6 rounded-[2rem]">
-                        <button onclick="activeRoomId = null; renderUI();" class="mb-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm transition-all"><i class='bx bx-arrow-back'></i> กลับ</button>
-                        <h2 class="text-2xl font-bold text-white mb-4">ระบบจัดการห้อง: ${classrooms[activeRoomId]?.name || activeRoomId}</h2>
-                        <div class="map-area p-4 min-h-[400px]">
-                            <p class="text-white/50 text-center w-full mt-20">กำลังโหลดผังที่นั่ง...</p>
-                        </div>
-                    </div>
-                `;
-                updateRoomViewDynamically();
+            if(activeRoomId) {
+                document.getElementById('welcomeSection').classList.add('hidden');
+                document.getElementById('staffAction')?.classList.add('hidden');
+                renderRoomView();
             } else {
+                document.getElementById('welcomeSection').classList.remove('hidden');
+                if(['super_admin', 'teacher'].includes(currentUser.role)) document.getElementById('staffAction').classList.remove('hidden');
                 renderDashboard();
             }
         }
 
+        function renderDashboard() {
+            const area = document.getElementById('contentArea');
+            const isStaff = ['super_admin', 'teacher'].includes(currentUser.role);
+            const query = document.getElementById('roomSearch')?.value.toLowerCase() || '';
+            let html = '';
+            
+            let roomsArr = Object.entries(classrooms).map(([id, data]) => ({ id, ...data }))
+                .filter(room => room.name.toLowerCase().includes(query) || room.id.toLowerCase().includes(query));
+            roomsArr.sort((a, b) => a.name.localeCompare(b.name, 'th', { numeric: true }));
+
+            if (isStaff) {
+                const groups = {};
+                roomsArr.forEach(room => {
+                    const match = room.name.match(/\d+/);
+                    const level = match ? match[0] : 'อื่นๆ';
+                    if (!groups[level]) groups[level] = [];
+                    groups[level].push(room);
+                });
+                const sortedLevels = Object.keys(groups).sort((a,b) => a-b);
+                sortedLevels.forEach(lv => {
+                    html += `<div class="mb-10"><h3 class="text-2xl font-bold mb-5 border-b border-white/20 pb-3">ระดับชั้น ม.${lv}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+                    groups[lv].forEach(room => {
+                        const booked = room.seats.filter(s => s.bookedBy).length;
+                        html += `<div class="glass-panel p-6 rounded-[2rem] flex flex-col group relative">
+                            <div class="flex justify-between mb-3"><button onclick="copyToClipboard('${room.id}')" class="bg-white/20 px-3 py-1 rounded-full text-xs font-mono">${room.id} <i class='bx bx-copy'></i></button><button onclick="deleteRoom('${room.id}')" class="text-white/50 hover:text-red-400"><i class='bx bx-trash'></i></button></div>
+                            <h3 class="text-2xl font-bold mb-4">${room.name}</h3>
+                            <div class="flex justify-between text-sm mb-2"><span>ความจุ</span><span>${booked}/${room.seats.length}</span></div>
+                            <button onclick="enterRoom('${room.id}')" class="w-full bg-white text-[#5AB2FF] py-3 rounded-2xl font-bold mb-2">เปิด</button>
+                            <div class="grid grid-cols-2 gap-2"><button onclick="editCapacity('${room.id}')" class="bg-black/10 py-2 rounded-xl text-xs">แก้ไขที่นั่ง</button><button onclick="resetLayout('${room.id}')" class="bg-black/10 py-2 rounded-xl text-xs">ผัง 3:3:2</button></div>
+                        </div>`;
+                    });
+                    html += `</div></div>`;
+                });
+            } else {
+                const myRoomId = Object.keys(classrooms).find(id => classrooms[id].seats.some(s => s.bookedBy === currentUser.email));
+                if (myRoomId) {
+                    const room = classrooms[myRoomId]; const seat = room.seats.find(s => s.bookedBy === currentUser.email);
+                    html = `<div class="glass-panel p-10 rounded-[2.5rem] bg-white/10 shadow-2xl"><h2>${room.name}</h2><p>ที่นั่งของคุณ: #${seat.id}</p><button onclick="enterRoom('${myRoomId}')" class="bg-white/20 px-8 py-4 rounded-full">ดูแผนผัง</button></div>`;
+                } else {
+                    html = `<div class="glass-panel p-10 rounded-[2.5rem] bg-black/10 shadow-2xl"><input id="joinCode" class="w-full bg-black/20 p-5 rounded-2xl text-xl font-bold uppercase mb-4" placeholder="ใส่ ROOM ID ที่นี่"><button onclick="joinByCode()" class="w-full bg-white text-[#5AB2FF] py-5 rounded-2xl font-black">JOIN ROOM</button></div>`;
+                }
+            }
+            area.innerHTML = html || `<p class="text-center py-20 text-white/50">ไม่พบข้อมูล</p>`;
+        }
+
+        function renderRoomView() {
+            const room = classrooms[activeRoomId];
+            const isStaff = ['super_admin', 'teacher'].includes(currentUser.role);
+            const mySeat = room.seats.find(s => s.bookedBy === currentUser.email);
+            document.getElementById('contentArea').innerHTML = `
+                <div class="glass-panel p-4 md:p-8 rounded-[2.5rem] animate-in flex flex-col items-center shadow-2xl">
+                    <div class="w-full flex flex-col md:flex-row justify-between items-center mb-6">
+                        <button onclick="changePage('home')" class="bg-black/20 px-6 py-2.5 rounded-full"><i class='bx bx-left-arrow-alt'></i> กลับ</button>
+                        <h2 class="text-3xl font-bold">${room.name}</h2>
+                        ${isStaff ? `<button onclick="exportExcel()" class="bg-white text-green-600 px-5 py-2.5 rounded-full font-bold">EXPORT</button>` : '<div></div>'}
+                    </div>
+                    <div class="map-area w-full max-w-[1100px] h-[65vh] border border-white/20" id="mapContainer">
+                        <div id="roomCanvas">
+                            <div class="absolute top-0 left-[462px] -translate-x-1/2 w-96 h-16 bg-white/10 rounded-2xl flex items-center justify-center font-bold">หน้ากระดาน</div>
+                            ${room.seats.map(s => {
+                                const isMe = s.bookedBy === currentUser.email;
+                                let label = s.id; if (isMe) label = "ME"; else if (s.bookedBy) label = s.name.split(' ')[0];
+                                return `<div id="desk-${s.id}" class="desk ${isMe ? 'my-seat' : (s.bookedBy ? 'booked' : '')}" style="left:${s.x}px; top:${s.y}px;" onmousedown="startDrag(event, ${s.id})" ontouchstart="startDrag(event, ${s.id})">
+                                    <div class="desk-tooltip"><span>${s.name || 'ว่าง'}</span></div>
+                                    <svg viewBox="0 0 100 120"><rect x="25" y="85" width="50" height="20" class="desk-chair" /><rect x="10" y="20" width="80" height="55" class="desk-top" /></svg>
+                                    <img src="${s.picture || ''}" class="avatar-overlay ${s.bookedBy && s.picture ? '' : 'hidden'} absolute top-[28px] left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full border-2 border-white/80 object-cover pointer-events-none">
+                                    <div class="desk-label ${s.bookedBy && s.picture ? 'hidden' : ''}">${label}</div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function getSeatLayoutPosition(i) {
+            const col = i % 8; const row = Math.floor(i / 8);
+            let xOffset = (col >= 3 ? 70 : 0) + (col >= 6 ? 70 : 0);
+            return { x: (col * 85) + 60 + xOffset, y: (row * 120) + 120 };
+        }
+
         function showCreateModal() {
             Swal.fire({
-                title: 'สร้างห้องเรียนใหม่',
-                html: `
-                    <input type="text" id="newRoomName" class="w-full bg-slate-100 p-4 rounded-xl border border-slate-300 focus:outline-[#5AB2FF] mb-3" placeholder="ชื่อห้องเรียน (เช่น M.1/1)">
-                    <input type="number" id="newRoomSeats" class="w-full bg-slate-100 p-4 rounded-xl border border-slate-300 focus:outline-[#5AB2FF]" placeholder="จำนวนที่นั่ง">
-                `,
+                title: 'สร้างห้องเรียนใหม่', 
+                html: `<input id="swal-name" class="swal2-input" placeholder="ชื่อห้อง"><input id="swal-count" type="number" class="swal2-input" placeholder="จำนวนที่นั่ง">`,
                 showCancelButton: true,
-                confirmButtonText: 'สร้างห้อง',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#5AB2FF',
-                background: 'rgba(255,255,255,0.95)',
-                preConfirm: () => {
-                    const name = document.getElementById('newRoomName').value;
-                    const seats = document.getElementById('newRoomSeats').value;
-                    if (!name || !seats) {
-                        Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบถ้วน');
+                preConfirm: () => [document.getElementById('swal-name').value, document.getElementById('swal-count').value]
+            }).then(res => {
+                if(res.isConfirmed) {
+                    const [name, count] = res.value; const id = Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const seats = [];
+                    for(let i=0; i<count; i++) {
+                        const pos = getSeatLayoutPosition(i);
+                        seats.push({ id: i+1, x: pos.x, y: pos.y, bookedBy: null, name: null, picture: null });
                     }
-                    return { name, seats };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('สำเร็จ!', 'สร้างห้องเรียนใหม่แล้ว', 'success');
+                    db.collection("classrooms").doc(id).set({ name, seats });
                 }
             });
         }
 
-        function openRoom(id) {
-            activeRoomId = id;
-            renderUI();
+        async function editCapacity(roomId) {
+            const { value: count } = await Swal.fire({ title: 'แก้ไขจำนวนที่นั่ง', input: 'number', showCancelButton: true });
+            if (count) {
+                const room = classrooms[roomId];
+                let updatedSeats = [...room.seats];
+                if (count > room.seats.length) {
+                    for(let i = room.seats.length; i < count; i++) {
+                        const pos = getSeatLayoutPosition(i);
+                        updatedSeats.push({ id: i+1, x: pos.x, y: pos.y, bookedBy: null, name: null, picture: null });
+                    }
+                } else { updatedSeats = updatedSeats.slice(0, count); }
+                await db.collection("classrooms").doc(roomId).update({ seats: updatedSeats });
+            }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('ntun_session_v15')) {
-                initApp();
-            }
-        });
+        async function randomSeat() {
+            if (isExpired && !['super_admin','teacher'].includes(currentUser.role)) return Swal.fire('หมดเวลาจอง','','error');
+            const room = classrooms[activeRoomId];
+            const available = room.seats.filter(s => !s.bookedBy);
+            if(available.length === 0) return Swal.fire('ที่นั่งเต็ม','','error');
+            const random = available[Math.floor(Math.random() * available.length)];
+            handleBooking(random.id, true);
+        }
 
+        async function joinByCode() {
+            const code = document.getElementById('joinCode').value.trim().toUpperCase();
+            if (classrooms[code]) enterRoom(code); else Swal.fire('ไม่พบห้อง','','warning');
+        }
+
+        async function enterRoom(id) { activeRoomId = id; renderUI(); }
+
+        function startDrag(e, id) {
+            const isStaff = ['super_admin','teacher'].includes(currentUser.role);
+            if (!isStaff) { handleBooking(id); return; }
+            dragId = id; isMoving = false;
+            const ev = e.touches ? e.touches[0] : e;
+            const zoom = window.innerWidth <= 600 ? 0.55 : (window.innerWidth <= 1024 ? 0.8 : 1);
+            startX = ev.clientX / zoom; startY = ev.clientY / zoom;
+            const el = document.getElementById('desk-'+id);
+            el.classList.add('dragging');
+            initX = parseInt(el.style.left); initY = parseInt(el.style.top);
+            const moveH = (me) => {
+                const mev = me.touches ? me.touches[0] : me;
+                const dx = (mev.clientX / zoom) - startX; const dy = (mev.clientY / zoom) - startY;
+                if(Math.abs(dx) > 5 || Math.abs(dy) > 5) { isMoving = true; el.style.left = (initX + dx)+'px'; el.style.top = (initY + dy)+'px'; }
+            };
+            const endH = () => {
+                document.removeEventListener('mousemove', moveH); document.removeEventListener('mouseup', endH);
+                document.removeEventListener('touchmove', moveH); document.removeEventListener('touchend', endH);
+                el.classList.remove('dragging');
+                if(isMoving) {
+                    const room = classrooms[activeRoomId]; const seat = room.seats.find(s => s.id === dragId);
+                    seat.x = parseInt(el.style.left); seat.y = parseInt(el.style.top);
+                    db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats }).then(() => dragId = null);
+                } else { handleBooking(dragId); dragId = null; }
+            };
+            document.addEventListener('mousemove', moveH); document.addEventListener('mouseup', endH);
+            document.addEventListener('touchmove', moveH, { passive: false }); document.addEventListener('touchend', endH);
+        }
+
+        async function handleBooking(sid, skip = false) {
+            const room = classrooms[activeRoomId]; const seat = room.seats.find(s => s.id === sid);
+            const isStaff = ['super_admin','teacher'].includes(currentUser.role);
+            if (!isStaff && isExpired && !seat.bookedBy) return Swal.fire('หมดเวลาจอง','','error');
+            if (seat.bookedBy) {
+                if (seat.bookedBy === currentUser.email || isStaff) {
+                    const res = await Swal.fire({ title: 'ยกเลิกจอง?', showCancelButton: true });
+                    if(res.isConfirmed) { seat.bookedBy = null; seat.name = null; seat.picture = null; db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats }); }
+                } return;
+            }
+            if (!isStaff && Object.values(classrooms).some(r => r.seats.some(s => s.bookedBy === currentUser.email))) return Swal.fire('คุณจองไปแล้ว','','error');
+            if(!skip) { const conf = await Swal.fire({ title: `จอง #${sid}?`, showCancelButton: true }); if(!conf.isConfirmed) return; }
+            seat.bookedBy = currentUser.email; seat.name = currentUser.name; seat.picture = currentUser.picture;
+            db.collection("classrooms").doc(activeRoomId).update({ seats: room.seats });
+        }
+
+        async function resetLayout(roomId) {
+            const room = classrooms[roomId];
+            const updated = room.seats.map((s, i) => { const pos = getSeatLayoutPosition(i); return { ...s, x: pos.x, y: pos.y }; });
+            await db.collection("classrooms").doc(roomId).update({ seats: updated });
+        }
+
+        async function clearAllBookings(roomId) {
+            const res = await Swal.fire({ title: 'ล้างจองทั้งหมด?', showCancelButton: true });
+            if (res.isConfirmed) {
+                const cleared = classrooms[roomId].seats.map(s => ({ ...s, bookedBy: null, name: null, picture: null }));
+                await db.collection("classrooms").doc(roomId).update({ seats: cleared });
+            }
+        }
+
+        function exportExcel() {
+            const room = classrooms[activeRoomId];
+            const data = room.seats.filter(s => s.bookedBy).map(s => ({ "ที่นั่ง": s.id, "ชื่อ": s.name, "อีเมล": s.bookedBy }));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), "รายชื่อ");
+            XLSX.writeFile(wb, `${room.name}.xlsx`);
+        }
+
+        async function deleteRoom(id) {
+            const res = await Swal.fire({ title: 'ลบห้อง?', showCancelButton: true });
+            if(res.isConfirmed) await db.collection("classrooms").doc(id).delete();
+        }
+
+        window.onload = initApp;
     </script>
 </body>
 </html>
